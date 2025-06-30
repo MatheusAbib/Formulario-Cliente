@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Cliente | Correios</title>
+    <title th:text="${cliente.id != null} ? 'Editar Cliente | Correios' : 'Cadastro de Cliente | Correios'">Cadastro de Cliente | Correios</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         :root {
             --correios-blue: #0033A0;
@@ -573,6 +575,27 @@
             top: 50px;
             left: -15px;
         }
+
+        /* Field specific styles */
+        .cep-field {
+            max-width: 265px;
+        }
+
+        .cvv-field {
+            max-width: 100px;
+        }
+
+        .telefone-field {
+            max-width: 200px;
+        }
+
+        .cpf-field {
+            max-width: 200px;
+        }
+
+        .logradouro-field input {
+            text-transform: capitalize;
+        }
     </style>
 </head>
 <body>
@@ -582,28 +605,29 @@
             <div class="logo-text">CORREIOS<span>+</span></div>
         </div>
         <div class="user-info">
-            <div class="user-avatar">MA</div>
+            <div class="user-avatar">JS</div>
         </div>
     </header>
 
     <!-- Sidebar -->
     <aside>
         <ul class="sidebar-menu">
-            <li><a href="#"><i>📊</i> Dashboard</a></li>
-            <li><a href="#" class="active"><i>📝</i> Cadastrar</a></li>
-            <li><a href="#"><i>📦</i> Encomendas</a></li>
-            <li><a href="#"><i>✉️</i> Correspondências</a></li>
-            <li><a href="#"><i>💰</i> Financeiro</a></li>
-            <li><a href="#"><i>📊</i> Relatórios</a></li>
-            <li><a href="#"><i>⚙️</i> Configurações</a></li>
+            <li><a href="#"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+            <li><a href="/addCliente" th:classappend="${cliente.id == null} ? 'active' : ''"><i class="fas fa-user-plus"></i> Cadastre-se</a></li>
+            <li><a href="/clientes"><i class="fas fa-users"></i> Lista de Usuários</a></li>
+            <li><a href="#"><i class="fas fa-box"></i> Encomendas</a></li>
+            <li><a href="#"><i class="fas fa-envelope"></i> Correspondências</a></li>
+            <li><a href="#"><i class="fas fa-dollar-sign"></i> Financeiro</a></li>
+            <li><a href="#"><i class="fas fa-chart-line"></i> Relatórios</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Configurações</a></li>
         </ul>
     </aside>
 
     <!-- Main Content -->
     <main>
         <div class="page-title">
-            <h1>Cadastro de Cliente</h1>
-            <div class="badge">NOVO</div>
+            <h1 th:text="${cliente.id != null} ? 'Editar Cliente' : 'Cadastro de Cliente'">Cadastro de Cliente</h1>
+            <div class="badge" th:text="${cliente.id != null} ? 'EDITAR' : 'NOVO'">NOVO</div>
         </div>
 
         <div class="form-container">
@@ -614,51 +638,52 @@
             <div class="corner-decoration bottom-left"></div>
             <div class="corner-decoration bottom-right"></div>
 
-            <!-- Formulário de cadastro -->
-            <form th:action="@{/addCliente}" th:if="${cliente.id == null}" method="post" id="formCadastro">
+            <!-- Formulário unificado para cadastro e edição -->
+            <form th:action="${cliente.id != null} ? @{/editarCliente/{id}(id=${cliente.id})} : @{/addCliente}" 
+                  method="post" 
+                  th:object="${cliente}"
+                  id="formCadastro">
                 
                 <div class="form-section">
                     <div class="section-title">Informações Pessoais</div>
                     
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="nome" name="nome" th:value="${cliente.nome}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="nome" name="nome" th:field="*{nome}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="nome">Nome Completo</label>
                             <div class="error" id="nomeError"></div>
                         </div>
-
+                        <div class="form-group floating-label-group telefone-field">
+                            <input type="text" id="telefone" name="telefone" th:field="*{telefone}" placeholder=" " required maxlength="15">
+                            <label class="floating-label" for="telefone">Telefone</label>
+                            <div class="error" id="telefoneError"></div>
+                        </div>
                         <div class="form-group floating-label-group">
-                            <input type="email" id="email" name="email" th:value="${cliente.email}" required autocomplete="off" placeholder=" ">
+                            <input type="email" id="email" name="email" th:field="*{email}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="email">E-mail</label>
                             <div class="error" id="emailError"></div>
-                        </div>
-
-                        <div class="form-group floating-label-group">
-                            <input type="text" id="telefone" name="telefone" placeholder=" " th:value="${cliente.telefone}" required>
-                            <label class="floating-label" for="telefone">Telefone</label>
-                            <div class="error" id="generoError"></div>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="date" id="dataNascimento" name="dataNascimento" th:value="${cliente.dataNascimento}" required autocomplete="off" placeholder=" ">
-                            <label class="floating-label" for="dataNascimento">Data de Nascimento</label>
+                            <input type="date" id="dataNascimento" name="dataNascimento" th:field="*{dataNascimento}" required autocomplete="off" placeholder=" ">
+                            <label class="floating-label" for="dataNascimento">Data do Pedido</label>
                             <div class="error" id="dataNascimentoError"></div>
                         </div>
                         
-                        <div class="form-group floating-label-group">
-                            <input type="text" id="cpf" name="cpf" placeholder=" " th:value="${cliente.cpf}" required autocomplete="off">
+                        <div class="form-group floating-label-group cpf-field">
+                            <input type="text" id="cpf" name="cpf" th:field="*{cpf}" placeholder=" " required autocomplete="off" maxlength="14">
                             <label class="floating-label" for="cpf">CPF</label>
                             <div class="error" id="cpfError"></div>
                         </div>
             
                         <div class="form-group floating-label-group custom-select-container">
-                            <select id="genero" name="genero" th:value="${cliente.genero}" required>
+                            <select id="genero" name="genero" th:field="*{genero}" required>
                                 <option value="" disabled selected></option>
-                                <option value="masculino" th:selected="${cliente.genero == 'M'}">Masculino</option>
-                                <option value="feminino" th:selected="${cliente.genero == 'F'}">Feminino</option>
-                                <option value="Prefiro não dizer" th:selected="${cliente.genero == 'Prefiro não dizer'}">Prefiro não dizer</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Feminino">Feminino</option>
+                                <option value="Prefiro não dizer">Prefiro não dizer</option>
                             </select>
                             <label class="floating-label" for="genero">Gênero</label>
                             <div class="error" id="generoError"></div>
@@ -666,42 +691,53 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-title">Segurança</div>
-                    
-                    <div class="form-row">
-                        <div class="form-group floating-label-group">
-                            <input type="password" id="senha1" name="senha1" required autocomplete="off" placeholder=" ">
-                            <label class="floating-label" for="senha1">Senha</label>
-                            <div class="error" id="senha1Error"></div>
-                        </div>
-                        
-                        <div class="form-group floating-label-group">
-                            <input type="password" id="senha2" name="senha2" required autocomplete="off" placeholder=" ">
-                            <label class="floating-label" for="senha2">Confirmar Senha</label>
-                            <div class="error" id="senha2Error"></div>
-                        </div>
-                    </div>
-                </div>
+               <div class="form-section">
+    <!-- Seção de Segurança -->
+<div class="form-section">
+    <div class="section-title">Segurança</div>
+    
+    <div class="form-row">
+        <div class="form-group floating-label-group">
+            <input type="password" id="senha" name="senha" 
+                   th:if="${cliente.id == null}" 
+                   required autocomplete="off" placeholder=" ">
+            <input type="password" id="senha" name="senha" 
+                   th:unless="${cliente.id == null}" 
+                   autocomplete="off" placeholder=" ">
+            <label class="floating-label" for="senha">
+                <span th:text="${cliente.id == null} ? 'Senha' : 'Nova Senha (opcional)'"></span>
+            </label>
+            <div class="error" id="senhaError"></div>
+        </div>
+        
+        <!-- Campo de confirmação de senha apenas para novo cadastro -->
+        <div class="form-group floating-label-group" th:if="${cliente.id == null}">
+            <input type="password" id="confirmarSenha" name="confirmarSenha" 
+                   required autocomplete="off" placeholder=" ">
+            <label class="floating-label" for="confirmarSenha">Confirmar Senha</label>
+            <div class="error" id="confirmarSenhaError"></div>
+        </div>
+    </div>
+</div>
 
                 <div class="form-section">
                     <div class="section-title">Endereço</div>
                     
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="tipoResidencia" name="tipoResidencia" th:value="${cliente.tipoResidencia}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="tipoResidencia" name="tipoResidencia" th:field="*{tipoResidencia}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="tipoResidencia">Tipo de Residência</label>
                             <div class="error" id="tipoResidenciaError"></div>
                         </div>
                         
-                        <div class="form-group floating-label-group">
-                            <input type="text" id="logradouro" name="logradouro" th:value="${cliente.logradouro}" required autocomplete="off" placeholder=" ">
+                        <div class="form-group floating-label-group logradouro-field">
+                            <input type="text" id="logradouro" name="logradouro" th:field="*{logradouro}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="logradouro">Logradouro</label>
                             <div class="error" id="logradouroError"></div>
                         </div>
                         
                         <div class="form-group floating-label-group">
-                            <input type="text" id="numero" name="numero" th:value="${cliente.numero}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="numero" name="numero" th:field="*{numero}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="numero">Número</label>
                             <div class="error" id="numeroError"></div>
                         </div>
@@ -709,13 +745,13 @@
 
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="bairro" name="bairro" th:value="${cliente.bairro}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="bairro" name="bairro" th:field="*{bairro}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="bairro">Bairro</label>
                             <div class="error" id="bairroError"></div>
                         </div>
                         
-                        <div class="form-group floating-label-group">
-                            <input type="text" id="cep" name="cep" th:value="${cliente.cep}" required autocomplete="off" placeholder=" ">
+                        <div class="form-group floating-label-group cep-field">
+                            <input type="text" id="cep" name="cep" th:field="*{cep}" required autocomplete="off" placeholder=" " maxlength="9">
                             <label class="floating-label" for="cep">CEP</label>
                             <div class="error" id="cepError"></div>
                         </div>
@@ -723,25 +759,25 @@
 
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="cidade" name="cidade" th:value="${cliente.cidade}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="cidade" name="cidade" th:field="*{cidade}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="cidade">Cidade</label>
                             <div class="error" id="cidadeError"></div>
                         </div>
                         
                         <div class="form-group floating-label-group">
-                            <input type="text" id="estado" name="estado" th:value="${cliente.estado}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="estado" name="estado" th:field="*{estado}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="estado">Estado</label>
                             <div class="error" id="estadoError"></div>
                         </div>
                         
                         <div class="form-group floating-label-group custom-select-container">
-                            <select id="pais" name="pais" th:value="${cliente.pais}" required>
+                            <select id="pais" name="pais" th:field="*{pais}" required>
                                 <option value="" disabled selected></option>
-                                <option value="Brasil" th:selected="${cliente.pais == 'Brasil'}">Brasil</option>
-                                <option value="Argentina" th:selected="${cliente.pais == 'Argentina'}">Argentina</option>
-                                <option value="Chile" th:selected="${cliente.pais == 'Chile'}">Chile</option>
-                                <option value="EUA" th:selected="${cliente.pais == 'EUA'}">Estados Unidos</option>
-                                <option value="Portugal" th:selected="${cliente.pais == 'Portugal'}">Portugal</option>
+                                <option value="Brasil">Brasil</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Chile">Chile</option>
+                                <option value="EUA">Estados Unidos</option>
+                                <option value="Portugal">Portugal</option>
                             </select>
                             <label class="floating-label" for="pais">País</label>
                             <div class="error" id="paisError"></div>
@@ -750,13 +786,13 @@
 
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="enderecoEntrega" name="enderecoEntrega" th:value="${cliente.enderecoEntrega}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="enderecoEntrega" name="enderecoEntrega" th:field="*{enderecoEntrega}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="enderecoEntrega">Endereço de Entrega</label>
                             <div class="error" id="enderecoEntregaError"></div>
                         </div>
                         
                         <div class="form-group floating-label-group">
-                            <input type="text" id="descricaoEndereco" name="descricaoEndereco" th:value="${cliente.descricaoEndereco}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="descricaoEndereco" name="descricaoEndereco" th:field="*{descricaoEndereco}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="descricaoEndereco">Descrição do Endereço</label>
                             <div class="error" id="descricaoEnderecoError"></div>
                         </div>
@@ -768,7 +804,7 @@
                     
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="numeroCartao" name="numeroCartao" th:value="${cliente.numeroCartao}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="numeroCartao" name="numeroCartao" th:field="*{numeroCartao}" required autocomplete="off" placeholder=" " maxlength="19">
                             <label class="floating-label" for="numeroCartao">Número do Cartão</label>
                             <div class="error" id="numeroCartaoError"></div>
                         </div>
@@ -776,26 +812,26 @@
 
                     <div class="form-row">
                         <div class="form-group floating-label-group">
-                            <input type="text" id="bandeira" name="bandeira" th:value="${cliente.bandeira}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="bandeira" name="bandeira" th:field="*{bandeira}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="bandeira">Bandeira</label>
                             <div class="error" id="bandeiraError"></div>
                         </div>
                         
-                        <div class="form-group floating-label-group">
-                            <input type="text" id="codigoSeguranca" name="codigoSeguranca" th:value="${cliente.codigoSeguranca}" required autocomplete="off" placeholder=" ">
+                        <div class="form-group floating-label-group cvv-field">
+                            <input type="text" id="codigoSeguranca" name="codigoSeguranca" th:field="*{codigoSeguranca}" required autocomplete="off" placeholder=" " maxlength="3">
                             <label class="floating-label" for="codigoSeguranca">CVV</label>
                             <div class="error" id="codigoSegurancaError"></div>
                         </div>
                         
                         <div class="form-group floating-label-group">
-                            <input type="text" id="nomeCartao" name="nomeCartao" th:value="${cliente.nomeCartao}" required autocomplete="off" placeholder=" ">
+                            <input type="text" id="nomeCartao" name="nomeCartao" th:field="*{nomeCartao}" required autocomplete="off" placeholder=" ">
                             <label class="floating-label" for="nomeCartao">Nome no Cartão</label>
                             <div class="error" id="nomeCartaoError"></div>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit">Salvar Cadastro</button>
+                <button type="submit" th:text="${cliente.id != null} ? 'Salvar Alterações' : 'Salvar Cadastro'">Salvar Cadastro</button>
             </form>
         </div>
     </main>
@@ -808,141 +844,178 @@
             <a href="#">Ajuda</a>
             <a href="#">Contato</a>
         </div>
-        <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" style="color: #f0f0f0; text-decoration: none;" target="_blank">Matheus Abib.</a> Todos os direitos reservados.</div>
+        <div class="copyright">© 2023 Correios. Todos os direitos reservados.</div>
     </footer>
 
     <script>
-        // Função para validar se a senha atende aos critérios
-        function validarSenhaComplexa(senha) {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
-            return regex.test(senha);
-        }
-
-        // Validação para o formulário de edição
-        document.getElementById('formEdicao').onsubmit = function (event) {
-            console.log("Formulário de edição enviado");
-
-            let formValid = true;
-
-            const senha = document.getElementById('senha').value.trim();
-            const senhaConfirmacao = document.getElementById('senhaConfirmacaoEdicao').value.trim();
-
-            // Limpa mensagens de erro anteriores
-            const erros = document.querySelectorAll('.error');
-            erros.forEach(erro => erro.classList.remove('active'));
-
-            // Verifica se as senhas coincidem
-            if (senha !== senhaConfirmacao) {
-                formValid = false;
-                document.getElementById("senhaConfirmacaoErrorEdicao").innerText = "As senhas não coincidem.";
-                document.getElementById("senhaConfirmacaoErrorEdicao").classList.add("active");
-            }
-
-            // Verifica a complexidade da senha
-            if (senha !== "" && !validarSenhaComplexa(senha)) {
-                formValid = false;
-                document.getElementById("senhaErrorEdicao").innerText = 
-                    "A senha deve ter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.";
-                document.getElementById("senhaErrorEdicao").classList.add("active");
-            }
-
-            // Impede o envio do formulário se houver erros
-            if (!formValid) {
-                event.preventDefault();
-            }
-        };
-
-        // Validação para o formulário de cadastro
-        document.getElementById('formCadastro').onsubmit = function (event) {
-            let formValid = true;
-
-            const senha1 = document.getElementById("senha1").value.trim();
-            const senha2 = document.getElementById("senha2").value.trim();
-
-            // Limpa mensagens de erro anteriores
-            const erros = document.querySelectorAll('.error');
-            erros.forEach(erro => erro.classList.remove('active'));
-
-            if (senha1 === "") {
-                formValid = false;
-                document.getElementById("senha1Error").innerText = "A senha é obrigatória.";
-                document.getElementById("senha1Error").classList.add("active");
-            } else if (!validarSenhaComplexa(senha1)) {
-                formValid = false;
-                document.getElementById("senha1Error").innerText = 
-                    "A senha deve ter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.";
-                document.getElementById("senha1Error").classList.add("active");
-            }
-
-            if (senha1 !== senha2) {
-                formValid = false;
-                document.getElementById("senha2Error").innerText = "As senhas não coincidem.";
-                document.getElementById("senha2Error").classList.add("active");
-            }
-
-            if (!formValid) {
-                event.preventDefault();
-            }
-        };
-
-        // Formatação dos campos CPF e Telefone
-        const cpfInput = document.querySelector("#cpf");
-        cpfInput.addEventListener("input", () => {
-            let cpf = cpfInput.value.replace(/\D/g, "");
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            cpfInput.value = cpf;
-        });
-
-        const telefoneInput = document.querySelector("#telefone");
-        telefoneInput.addEventListener("input", () => {
-            let telefone = telefoneInput.value.replace(/\D/g, "");
-            telefone = telefone.replace(/(\d{2})(\d)/, "($1) $2");
-            telefone = telefone.replace(/(\d{5})(\d)/, "$1-$2");
-            telefoneInput.value = telefone;
-        });
-
-        // Efeito de floating label
-        document.querySelectorAll('.floating-label-group input, .floating-label-group select').forEach(element => {
-            // Verifica se o campo já tem valor (para edição)
-            if (element.value) {
-                const label = element.parentElement.querySelector('.floating-label');
-                label.style.top = '-8px';
-                label.style.left = '10px';
-                label.style.fontSize = '0.75rem';
-                label.style.color = 'var(--primary-color)';
-                label.style.background = 'white';
-            }
-            
-            // Adiciona evento de focus
-            element.addEventListener('focus', function() {
-                const label = this.parentElement.querySelector('.floating-label');
-                label.style.top = '-8px';
-                label.style.left = '10px';
-                label.style.fontSize = '0.75rem';
-                label.style.color = 'var(--primary-color)';
-                label.style.background = 'white';
+        // Máscaras para os campos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Máscara para CPF (000.000.000-00)
+            const cpfInput = document.getElementById('cpf');
+            cpfInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, ''); // remove tudo que não é número
+                
+                // Limita a 11 dígitos
+                value = value.substring(0, 11);
+                
+                // Aplica a formatação: 000.000.000-00
+                if (value.length > 9) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                } else if (value.length > 6) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+                } else if (value.length > 3) {
+                    value = value.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+                }
+                
+                this.value = value;
             });
-            
-            // Adiciona evento de blur
-            element.addEventListener('blur', function() {
-                const label = this.parentElement.querySelector('.floating-label');
-                if (!this.value && this.tagName !== 'SELECT') {
-                    label.style.top = '12px';
-                    label.style.left = '15px';
-                    label.style.fontSize = '0.95rem';
-                    label.style.color = 'var(--secondary-color)';
-                    label.style.background = 'transparent';
-                } else if (this.tagName === 'SELECT' && !this.value) {
-                    label.style.top = '12px';
-                    label.style.left = '15px';
-                    label.style.fontSize = '0.95rem';
-                    label.style.color = 'var(--secondary-color)';
-                    label.style.background = 'transparent';
+
+            // Máscara para Telefone ((00) 00000-0000)
+            const telefoneInput = document.getElementById('telefone');
+            telefoneInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 0) {
+                    value = '(' + value.substring(0, 2) + ') ' + value.substring(2);
+                }
+                if (value.length > 10) {
+                    value = value.substring(0, 10) + '-' + value.substring(10);
+                }
+                this.value = value.substring(0, 15);
+            });
+
+            // Máscara para CEP (00000-000)
+            const cepInput = document.getElementById('cep');
+            cepInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 5) {
+                    value = value.substring(0, 5) + '-' + value.substring(5);
+                }
+                this.value = value.substring(0, 9);
+            });
+
+            // Máscara para CVV (apenas números, max 4 dígitos)
+            const cvvInput = document.getElementById('codigoSeguranca');
+            cvvInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '').substring(0, 3);
+            });
+
+            // Máscara para Número do Cartão (0000 0000 0000 0000)
+            const cartaoInput = document.getElementById('numeroCartao');
+            cartaoInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 4) {
+                    value = value.substring(0, 4) + ' ' + value.substring(4);
+                }
+                if (value.length > 9) {
+                    value = value.substring(0, 9) + ' ' + value.substring(9);
+                }
+                if (value.length > 14) {
+                    value = value.substring(0, 14) + ' ' + value.substring(14);
+                }
+                this.value = value.substring(0, 19);
+            });
+
+            // Formatação automática para Logradouro (capitalize)
+            const logradouroInput = document.getElementById('logradouro');
+            logradouroInput.addEventListener('blur', function() {
+                this.value = this.value.toLowerCase().replace(/(?:^|\s)\S/g, function(a) {
+                    return a.toUpperCase();
+                });
+            });
+
+            // Validação de formulário
+         document.getElementById('formCadastro').onsubmit = function(event) {
+    let isValid = true;
+    
+    // Validação básica de CPF (apenas formato)
+    if (cpfInput.value.length < 14) {
+        document.getElementById('cpfError').textContent = 'CPF inválido';
+        document.getElementById('cpfError').classList.add('active');
+        isValid = false;
+    } else {
+        document.getElementById('cpfError').classList.remove('active');
+    }
+    
+    // Validação básica de CEP (apenas formato)
+    if (cepInput.value.length < 9) {
+        document.getElementById('cepError').textContent = 'CEP inválido';
+        document.getElementById('cepError').classList.add('active');
+        isValid = false;
+    } else {
+        document.getElementById('cepError').classList.remove('active');
+    }
+    
+    // Validação básica de telefone (apenas formato)
+    if (telefoneInput.value.length < 15) {
+        document.getElementById('telefoneError').textContent = 'Telefone inválido';
+        document.getElementById('telefoneError').classList.add('active');
+        isValid = false;
+    } else {
+        document.getElementById('telefoneError').classList.remove('active');
+    }
+    
+    // Validação básica de CVV (3 ou 4 dígitos)
+    if (cvvInput.value.length < 3) {
+        document.getElementById('codigoSegurancaError').textContent = 'CVV inválido';
+        document.getElementById('codigoSegurancaError').classList.add('active');
+        isValid = false;
+    } else {
+        document.getElementById('codigoSegurancaError').classList.remove('active');
+    }
+    
+    // Validação de senha apenas para novo cadastro
+    if (document.getElementById('confirmarSenha')) {
+        const senha = document.getElementById('senha').value;
+        const confirmarSenha = document.getElementById('confirmarSenha').value;
+        
+        if (senha.length < 6) {
+            document.getElementById('senhaError').textContent = 'Senha deve ter pelo menos 6 caracteres';
+            document.getElementById('senhaError').classList.add('active');
+            isValid = false;
+        } else {
+            document.getElementById('senhaError').classList.remove('active');
+        }
+        
+        if (senha !== confirmarSenha) {
+            document.getElementById('confirmarSenhaError').textContent = 'As senhas não coincidem';
+            document.getElementById('confirmarSenhaError').classList.add('active');
+            isValid = false;
+        } else {
+            document.getElementById('confirmarSenhaError').classList.remove('active');
+        }
+    }
+    
+    if (!isValid) {
+        event.preventDefault();
+    }
+};
+
+            // Lista de campos que não podem conter números
+            const camposSemNumeros = [
+                'nome', 'cidade', 'bairro', 'estado',
+                'tipoResidencia', 'bandeira',
+                'nomeCartao', 'enderecoEntrega', 'descricaoEndereco'
+            ];
+
+            camposSemNumeros.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('input', function() {
+                        this.value = this.value.replace(/\d/g, ''); // Remove dígitos
+                    });
                 }
             });
         });
+
+        // Animação para os campos com máscara quando completos
+        function animateField(field) {
+            field.style.transform = 'scale(1.02)';
+            field.style.boxShadow = '0 0 0 2px rgba(0, 179, 60, 0.3)';
+            setTimeout(() => {
+                field.style.transform = '';
+                field.style.boxShadow = '';
+            }, 300);
+        }
     </script>
 </body>
 </html>

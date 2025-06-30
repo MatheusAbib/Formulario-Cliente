@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+import java.time.LocalDateTime;
 
 @Controller
 public class ClienteController {
@@ -23,159 +26,94 @@ public class ClienteController {
     // Método para listar os clientes
     @GetMapping("/clientes")
     public String listarClientes(Model model) {
-        Iterable<Cliente> clientes = clienteRepository.findAll();
-        model.addAttribute("clientes", clientes);
-        return "clientes";  // Página de listagem de clientes
+        model.addAttribute("clientes", clienteRepository.findAll());
+        return "clientes";
     }
 
     // Método para exibir o formulário de adição
     @GetMapping("/addCliente")
     public String showForm(Model model) {
-        model.addAttribute("cliente", new Cliente());  // Formulário para adicionar cliente
-        return "formularioCliente";  // Página do formulário
+        model.addAttribute("cliente", new Cliente());
+        return "formularioCliente";
     }
 
-    // Método para adicionar um cliente
+    // Método para adicionar um cliente (usando ModelAttribute)
     @PostMapping("/addCliente")
-    public String addCliente(@RequestParam String nome, 
-                             @RequestParam String email,
-                             @RequestParam String genero,
-                             @RequestParam String dataNascimento,
-                             @RequestParam String cpf,
-                             @RequestParam String telefone,
-                             @RequestParam String senha1,
-                             @RequestParam String senha2,  // Campo para confirmar a senha
-                             @RequestParam String enderecoEntrega, 
-                             @RequestParam String descricaoEndereco,
-                             @RequestParam String numeroCartao,
-                             @RequestParam String bandeira,
-                             @RequestParam String codigoSeguranca,
-                             @RequestParam String nomeCartao,
-                             @RequestParam String tipoResidencia,  // Novo campo
-                             @RequestParam String logradouro,  // Novo campo
-                             @RequestParam String numero,  // Novo campo
-                             @RequestParam String bairro,  // Novo campo
-                             @RequestParam String cep,  // Novo campo
-                             @RequestParam String cidade,  // Novo campo
-                             @RequestParam String estado,  // Novo campo
-                             @RequestParam String pais) {  // Novo campo
-        // Validação: as senhas precisam ser iguais
+    public String addCliente(@ModelAttribute Cliente cliente,
+                            @RequestParam String senha1,
+                            @RequestParam String senha2) {
+        
+        // Validação de senha
         if (!senha1.equals(senha2)) {
-            // Se as senhas não coincidirem, retorna um erro
-            return "As senhas não coincidem. Tente novamente.";  // Isso pode ser uma mensagem para exibir no front-end
+            return "redirect:/addCliente?error=As senhas não coincidem";
         }
-
-        Cliente cliente = new Cliente();
-        cliente.setNome(nome);
-        cliente.setEmail(email);
-        cliente.setGenero(genero);
-        cliente.setDataNascimento(dataNascimento);
-        cliente.setCpf(cpf);
-        cliente.setTelefone(telefone);
-        cliente.setSenha(senha1);  // Salvando a senha do cliente
-        cliente.setEnderecoEntrega(enderecoEntrega);  // Salvando o endereço de entrega
-        cliente.setDescricaoEndereco(descricaoEndereco);  // Salvando a descrição do endereço
         
-        // Salvando os dados do cartão
-        cliente.setNumeroCartao(numeroCartao);
-        cliente.setBandeira(bandeira);
-        cliente.setCodigoSeguranca(codigoSeguranca);
-        cliente.setNomeCartao(nomeCartao);
-
+        cliente.setSenha(senha1);
+        cliente.setDataCadastro(LocalDateTime.now());
+        clienteRepository.save(cliente);
         
-        // Salvando os novos campos de endereço
-        cliente.setTipoResidencia(tipoResidencia);
-        cliente.setLogradouro(logradouro);
-        cliente.setNumero(numero);
-        cliente.setBairro(bairro);
-        cliente.setCep(cep);
-        cliente.setCidade(cidade);
-        cliente.setEstado(estado);
-        cliente.setPais(pais);
-
-        // Atribuindo a data de cadastro
-        cliente.setDataCadastro(java.time.LocalDateTime.now());  // Data e hora de criação
-
-        clienteRepository.save(cliente);  // Salva o cliente com a data de cadastro
-        return "redirect:/clientes";  // Redireciona após salvar
+        return "redirect:/clientes";
     }
 
     // Método para exibir o formulário de edição
     @GetMapping("/editarCliente/{id}")
     public String editarCliente(@PathVariable Long id, Model model) {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
-        model.addAttribute("cliente", cliente);  // Passa o cliente para o formulário
-        return "formularioCliente";  // Página do formulário de edição
+        Cliente cliente = clienteRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+        model.addAttribute("cliente", cliente);
+        return "formularioCliente";
     }
 
-    // Método para salvar as alterações do cliente
+    // Método para salvar as alterações do cliente (usando ModelAttribute)
     @PostMapping("/editarCliente/{id}")
-    public String salvarAlteracoes(@PathVariable Long id, 
-                                    @RequestParam String nome, 
-                                    @RequestParam String email,
-                                    @RequestParam String genero, 
-                                    @RequestParam String dataNascimento,
-                                    @RequestParam String cpf,
-                                    @RequestParam String telefone,
-                                    @RequestParam String enderecoEntrega, 
-                                    @RequestParam String descricaoEndereco,
-                                    @RequestParam String senha,
-                                    @RequestParam String numeroCartao,
-                                    @RequestParam String bandeira,
-                                    @RequestParam String codigoSeguranca,
-                                    @RequestParam String nomeCartao,
-                                    @RequestParam String tipoResidencia,  // Novo campo
-                                    @RequestParam String logradouro,  // Novo campo
-                                    @RequestParam String numero,  // Novo campo
-                                    @RequestParam String bairro,  // Novo campo
-                                    @RequestParam String cep,  // Novo campo
-                                    @RequestParam String cidade,  // Novo campo
-                                    @RequestParam String estado,  // Novo campo
-                                    @RequestParam String pais) {  // Novo campo
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+    public String salvarAlteracoes(@PathVariable Long id,
+                                  @ModelAttribute Cliente clienteAtualizado,
+                                  @RequestParam(required = false) String senha) {
         
-        // Atualiza todos os campos
-        cliente.setNome(nome);
-        cliente.setEmail(email);
-        cliente.setGenero(genero);
-        cliente.setDataNascimento(dataNascimento);
-        cliente.setCpf(cpf);
-        cliente.setTelefone(telefone);
-        cliente.setEnderecoEntrega(enderecoEntrega);  // Atualiza o endereço de entrega
-        cliente.setDescricaoEndereco(descricaoEndereco);  // Atualiza a descrição do endereço
+        Cliente cliente = clienteRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+        
+        // Atualiza os campos
+        cliente.setNome(clienteAtualizado.getNome());
+        cliente.setEmail(clienteAtualizado.getEmail());
+        cliente.setGenero(clienteAtualizado.getGenero());
+        cliente.setDataNascimento(clienteAtualizado.getDataNascimento());
+        cliente.setCpf(clienteAtualizado.getCpf());
+        cliente.setTelefone(clienteAtualizado.getTelefone());
+        cliente.setEnderecoEntrega(clienteAtualizado.getEnderecoEntrega());
+        cliente.setDescricaoEndereco(clienteAtualizado.getDescricaoEndereco());
+        
+        // Atualiza senha apenas se fornecida
         if (senha != null && !senha.isEmpty()) {
-        cliente.setSenha(senha);  // Atualiza a senha se fornecida
-    }
+            cliente.setSenha(senha);
+        }
         
-        // Atualiza os dados do cartão
-        cliente.setNumeroCartao(numeroCartao);
-        cliente.setBandeira(bandeira);
-        cliente.setCodigoSeguranca(codigoSeguranca);
-        cliente.setNomeCartao(nomeCartao);
-
+        // Dados do cartão
+        cliente.setNumeroCartao(clienteAtualizado.getNumeroCartao());
+        cliente.setBandeira(clienteAtualizado.getBandeira());
+        cliente.setCodigoSeguranca(clienteAtualizado.getCodigoSeguranca());
+        cliente.setNomeCartao(clienteAtualizado.getNomeCartao());
         
-        // Atualiza os novos campos de endereço
-        cliente.setTipoResidencia(tipoResidencia);
-        cliente.setLogradouro(logradouro);
-        cliente.setNumero(numero);
-        cliente.setBairro(bairro);
-        cliente.setCep(cep);
-        cliente.setCidade(cidade);
-        cliente.setEstado(estado);
-        cliente.setPais(pais);
+        // Endereço
+        cliente.setTipoResidencia(clienteAtualizado.getTipoResidencia());
+        cliente.setLogradouro(clienteAtualizado.getLogradouro());
+        cliente.setNumero(clienteAtualizado.getNumero());
+        cliente.setBairro(clienteAtualizado.getBairro());
+        cliente.setCep(clienteAtualizado.getCep());
+        cliente.setCidade(clienteAtualizado.getCidade());
+        cliente.setEstado(clienteAtualizado.getEstado());
+        cliente.setPais(clienteAtualizado.getPais());
         
-        // Atribui a data de alteração
-        cliente.setDataAlteracao(java.time.LocalDateTime.now());  // Data e hora da alteração
+        cliente.setDataAlteracao(LocalDateTime.now());
+        clienteRepository.save(cliente);
         
-        clienteRepository.save(cliente);  // Salva as alterações no banco de dados
-        
-        return "redirect:/clientes";  // Redireciona após salvar
+        return "redirect:/clientes";
     }
 
     // Método para excluir um cliente
     @GetMapping("/excluirCliente/{id}")
     public String excluirCliente(@PathVariable Long id) {
-        clienteService.excluirCliente(id);  // Chama o serviço para excluir o cliente
-        return "redirect:/clientes";  // Redireciona para a lista de clientes
+        clienteService.excluirCliente(id);
+        return "redirect:/clientes";
     }
 }
