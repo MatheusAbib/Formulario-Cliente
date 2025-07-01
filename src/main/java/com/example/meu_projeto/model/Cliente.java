@@ -101,7 +101,7 @@ public class Cliente {
         this.dataAlteracao = null;  // Inicializa a data de alteração como null
     }
 
-    public Cliente(String nome, String email, String genero, String dataNascimento, String cpf, String telefone, String senha, String tipoResidencia, 
+    public Cliente(String nome, String email, String genero, String dataNascimento, String cpf, String telefone, String senha,String tipoResidencia, 
                    String logradouro, String numero, String bairro, String cep, 
                    String cidade, String estado, String pais,
                    String enderecoEntrega, String descricaoEndereco, String numeroCartao,

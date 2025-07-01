@@ -23,6 +23,8 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
+    
+
     // Método para listar os clientes
     @GetMapping("/clientes")
     public String listarClientes(Model model) {
@@ -38,22 +40,30 @@ public class ClienteController {
     }
 
     // Método para adicionar um cliente (usando ModelAttribute)
-    @PostMapping("/addCliente")
-    public String addCliente(@ModelAttribute Cliente cliente,
-                            @RequestParam String senha1,
-                            @RequestParam String senha2) {
-        
-        // Validação de senha
-        if (!senha1.equals(senha2)) {
-            return "redirect:/addCliente?error=As senhas não coincidem";
-        }
-        
-        cliente.setSenha(senha1);
-        cliente.setDataCadastro(LocalDateTime.now());
-        clienteRepository.save(cliente);
-        
-        return "redirect:/clientes";
+   @PostMapping("/addCliente")
+public String addCliente(@ModelAttribute Cliente cliente,
+                        @RequestParam String senha,
+                        @RequestParam String confirmarSenha,
+                        Model model) {
+    
+    // System.out.println("Dados recebidos - Senha: " + senha + ", Confirmar: " + confirmarSenha);
+    
+    if (!senha.equals(confirmarSenha)) {
+        model.addAttribute("error", "As senhas não coincidem");
+        return "formularioCliente";
     }
+    
+    if (senha.length() < 6) {
+        model.addAttribute("error", "A senha deve ter pelo menos 6 caracteres");
+        return "formularioCliente";
+    }
+    
+    cliente.setSenha(senha);
+    cliente.setDataCadastro(LocalDateTime.now());
+    clienteRepository.save(cliente);
+    
+    return "redirect:/clientes?success=Cliente cadastrado com sucesso";
+}
 
     // Método para exibir o formulário de edição
     @GetMapping("/editarCliente/{id}")
