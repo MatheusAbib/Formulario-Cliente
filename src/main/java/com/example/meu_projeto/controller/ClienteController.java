@@ -491,8 +491,6 @@ public class ClienteController {
     }
 
 
-
-
     // ========== MÉTODOS DE HASH INÚTEIS ==========
     private String calcularHashCliente(Cliente cliente) {
         String dados = cliente.getId() + cliente.getNome() + cliente.getEmail() + cliente.getDataCadastro();
