@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/Cliente.css">
+    <link rel="stylesheet" href="/css/Styles.css">
 
 </head>
 <body>
@@ -75,38 +75,50 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Loop através dos clientes -->
-                        <tr th:each="cliente : ${clientes}">
-                            <td th:text="${cliente.id}"></td>
-                            <td th:text="${cliente.nome}"></td>
-                            <td th:text="${cliente.email}"></td>
-                            <td th:text="${cliente.telefone}"></td>
-                            <td th:text="${cliente.cpf}"></td>
-                            <td th:text="${cliente.genero}"></td>
-                            <td th:text="${cliente.dataNascimento}"></td>
-                            <td th:text="${cliente.tipoResidencia}"></td>
-                            <td th:text="${cliente.cidade}"></td>
-                            <td th:text="${cliente.estado}"></td>
-                            <td th:text="${cliente.bairro}"></td>
-                            <td th:text="${cliente.cep}"></td>
-                            <td th:text="${cliente.numero}"></td>
-                            <td th:text="${cliente.bandeira}"></td>
-                            <td th:text="${cliente.numeroCartao}"></td>
-                            <td th:text="${cliente.dataCadastro != null ? cliente.dataCadastro.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : ''}"></td>
-                            <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a class="btn-action btn-edit" style="text-decoration: none;" th:href="@{/editarCliente/{id}(id=${cliente.id})}">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <a class="btn-action btn-delete" style="text-decoration: none;" th:href="@{/excluirCliente/{id}(id=${cliente.id})}">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
+      <tbody>
+    <!-- Mensagem se lista estiver vazia -->
+    <tr th:if="${#lists.isEmpty(clientes)}">
+        <td colspan="18" style="text-align: center; padding: 20px; font-weight: bold;">
+            Nenhum cliente cadastrado no momento.
+        </td>
+    </tr>
+
+    <!-- Loop através dos clientes -->
+    <tr th:each="cliente : ${clientes}">
+        <td th:text="${cliente.id}"></td>
+        <td th:text="${cliente.nome}"></td>
+        <td th:text="${cliente.email}"></td>
+        <td th:text="${cliente.telefone}"></td>
+        <td th:text="${cliente.cpf}"></td>
+        <td th:text="${cliente.genero}"></td>
+        <td th:text="${cliente.dataNascimento}"></td>
+        <td th:text="${cliente.tipoResidencia}"></td>
+        <td th:text="${cliente.cidade}"></td>
+        <td th:text="${cliente.estado}"></td>
+        <td th:text="${cliente.bairro}"></td>
+        <td th:text="${cliente.cep}"></td>
+        <td th:text="${cliente.numero}"></td>
+        <td th:text="${cliente.bandeira}"></td>
+        <td th:text="${cliente.numeroCartao}"></td>
+        <td th:text="${cliente.dataCadastro != null ? cliente.dataCadastro.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : ''}"></td>
+        <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
+        <td>
+            <div class="action-buttons">
+                <a class="btn-action btn-edit" style="text-decoration: none;" th:href="@{/editarCliente/{id}(id=${cliente.id})}">
+                    <i class="fas fa-pencil-alt"></i>
+                </a>
+              <a class="btn-action btn-delete"
+                style="text-decoration: none; cursor: pointer;"
+                th:attr="data-id=${cliente.id}"
+                onclick="confirmarExclusao(this)">
+                    <i class="fas fa-trash"></i>
+                </a>
+
+            </div>
+        </td>
+    </tr>
+</tbody>
+
                 </table>
             </div>
 
@@ -130,5 +142,41 @@
         </div>
         <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" style="color: #f0f0f0;">Matheus Abib</a>. Todos os direitos reservados.</div>
     </footer>
+
+    <!-- Modal de confirmação -->
+<div id="modalConfirmacao" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+        <h2>Confirmar Exclusão</h2>
+        <p>Tem certeza que deseja excluir este cliente?</p>
+        <div class="modal-actions">
+            <a onclick="cancelarExclusao()" class="btn-cancelar">Cancelar</a>
+            <a id="btnConfirmarExclusao" class="btn-confirmar" href="#">Excluir</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmarExclusao(elemento) {
+        const clienteId = elemento.getAttribute("data-id");
+        const modal = document.getElementById("modalConfirmacao");
+        const confirmarBtn = document.getElementById("btnConfirmarExclusao");
+
+        confirmarBtn.href = `/excluirCliente/${clienteId}`;
+        modal.style.display = "flex";
+    }
+
+    function cancelarExclusao() {
+        document.getElementById("modalConfirmacao").style.display = "none";
+    }
+
+    // Fechar modal ao clicar fora
+    window.onclick = function(event) {
+        const modal = document.getElementById("modalConfirmacao");
+        if (event.target === modal) {
+            cancelarExclusao();
+        }
+    }
+</script>
+
 </body>
 </html>
