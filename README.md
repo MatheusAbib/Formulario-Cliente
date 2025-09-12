@@ -28,11 +28,14 @@ Sistema completo para gerenciamento de clientes desenvolvido para os **Correios*
 
 ## 💻 Tecnologias Utilizadas
 
-![Java](https://img.shields.io/badge/Java-17%2B-blue)  
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.1-green)  
-![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3.1-blueviolet)  
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.2-purple)  
-![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+<div>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5" width="40" height="40" /> 
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3" width="40" height="40" /> 
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" width="40" height="40" />
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="JAVA" width="40" height="40" /> 
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="mysql" width="40" height="40" /> 
+
+</div>
 
 ---
 
