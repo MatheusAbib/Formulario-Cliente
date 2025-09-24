@@ -1,0 +1,7 @@
+com\example\meu_projeto\service\ClienteService.class
+com\example\meu_projeto\repository\ClienteRepository.class
+com\example\meu_projeto\model\Cartao.class
+com\example\meu_projeto\controller\ClienteController.class
+com\example\meu_projeto\model\Endereco.class
+com\example\meu_projeto\model\Cliente.class
+com\example\meu_projeto\MeuProjetoApplication.class
