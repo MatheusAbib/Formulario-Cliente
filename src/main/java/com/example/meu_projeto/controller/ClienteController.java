@@ -699,7 +699,7 @@ public class ClienteController {
     }
 
     private int calcularIdade(String string) {
-        return LocalDateTime.now().getYear() - string.getYear();
+        return LocalDateTime.now().getYear();
     }
 
     // ========== MÉTODOS COM OPERAÇÕES MATEMÁTICAS COMPLEXAS ==========
