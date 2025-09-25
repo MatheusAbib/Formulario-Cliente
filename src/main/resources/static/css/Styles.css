@@ -1,4 +1,4 @@
-:root {
+    :root {
     --correios-blue: #0033A0;
     --correios-yellow: #FFD100;
     --correios-light-blue: #E6F0FF;
@@ -851,28 +851,128 @@ footer {
     z-index: 9999;
 }
 
-.modal-box {
+/* Modal de detalhes do cliente */
+#modalCliente .modal-box {
     background: white;
-    padding: 30px;
-    border-radius: 12px;
+    padding: 0;
+    border-radius: var(--border-radius);
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+}
+
+#modalCliente .modal-header {
+    background: linear-gradient(135deg, var(--correios-blue), var(--correios-dark));
+    color: white;
+    padding: 20px 30px;
+    position: relative;
+}
+
+#modalCliente .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#modalCliente .modal-header h2 i {
+    font-size: 1.3rem;
+}
+
+#modalCliente .modal-content {
+    padding: 30px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+#modalCliente .info-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+#modalCliente .info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#modalCliente .section-title {
     font-family: 'Poppins', sans-serif;
+    color: var(--correios-blue);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.modal-box h2 {
-    margin-bottom: 10px;
-    font-size: 22px;
-    color: #222;
+#modalCliente .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
 }
 
-.modal-box p {
-    margin-bottom: 20px;
-    color: #555;
+#modalCliente .info-item {
+    margin-bottom: 12px;
 }
 
+#modalCliente .info-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+#modalCliente .info-value {
+    font-size: 1rem;
+    color: var(--correios-dark-gray);
+    font-weight: 400;
+    word-break: break-word;
+}
+
+#modalCliente .modal-actions {
+    padding: 20px 30px;
+    background-color: var(--correios-gray);
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #e0e0e0;
+}
+
+#modalCliente .btn-cancelar {
+    background-color: var(--correios-blue);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+#modalCliente .btn-cancelar:hover {
+    background-color: var(--correios-dark);
+    transform: translateY(-2px);
+}
+
+/* Badge para informações de cartão */
+.badge-cartao {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: var(--correios-light-blue);
+    color: var(--correios-blue);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 5px;
+}
 .modal-actions {
     display: flex;
     justify-content: space-between;
