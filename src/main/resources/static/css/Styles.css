@@ -1,4 +1,4 @@
-    :root {
+:root {
     --correios-blue: #0033A0;
     --correios-yellow: #FFD100;
     --correios-light-blue: #E6F0FF;
@@ -9,7 +9,7 @@
     --transition: all 0.3s ease;
     --active-color: #2ecc71;
     --inactive-color: #e74c3c;
-}
+    }
 
 * {
     box-sizing: border-box;
@@ -512,7 +512,7 @@ button::after {
 .error {
     color: #d32f2f;
     font-size: 0.8rem;
-    margin-top: -15px;
+    margin-top: 5px;
     margin-bottom: 15px;
     display: none;
     background-color: rgba(211, 47, 47, 0.05);
