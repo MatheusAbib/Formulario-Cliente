@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/Styles.css">
+    <link rel="stylesheet" th:href="@{/css/Styles.css}">
 
 </head>
-<body>
+<body th:attr="
+    data-toast-type=${toastType},
+    data-toast-title=${toastTitle},
+    data-toast-message=${toastMessage}
+">
     <!-- Header -->
     <header>
         <div class="logo">
@@ -25,13 +29,9 @@
     <!-- Sidebar -->
     <aside>
         <ul class="sidebar-menu">
-            <li><a href="#"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
-            <li><a href="/addCliente"><i class="fas fa-user-plus"></i> Cadastre-se</a></li>
+
+            <li><a href="/clientes/add"><i class="fas fa-user-plus"></i> Cadastre-se</a></li>
             <li><a href="#" class="active"><i class="fas fa-users"></i> Lista de Usuários</a></li>
-            <li><a href="#"><i class="fas fa-box"></i> Encomendas</a></li>
-            <li><a href="#"><i class="fas fa-envelope"></i> Correspondências</a></li>
-            <li><a href="#"><i class="fas fa-dollar-sign"></i> Financeiro</a></li>
-            <li><a href="#"><i class="fas fa-chart-line"></i> Relatórios</a></li>
             <li><a href="#"><i class="fas fa-cog"></i> Configurações</a></li>
         </ul>
     </aside>
@@ -53,67 +53,47 @@
             <!-- Container com rolagem vertical -->
             <div class="table-scroll-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Email</th>
-                            <th>Telefone</th>
-                            <th>CPF</th>
-                            <th>Gênero</th>
-                            <th>Pedido</th>
-                            <th>Residência</th>
-                            <th>Cidade</th>
-                            <th>Estado</th>
-                            <th>Bairro</th>
-                            <th>CEP</th>
-                            <th>Número</th>
-                            <th>Bandeira</th>
-                            <th>N° Cartão</th>
-                            <th>Cadastro</th>
-                            <th>Editado</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-      <tbody>
-    <!-- Mensagem se lista estiver vazia -->
+                 <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>Nascimento</th>
+        <th>Bandeira</th>
+        <th>CEP</th>
+        <th>Editado</th>
+        <th>Ações</th>
+    </tr>
+</thead>
+<tbody>
     <tr th:if="${#lists.isEmpty(clientes)}">
-        <td colspan="18" style="text-align: center; padding: 20px; font-weight: bold;">
+        <td colspan="6" style="text-align: center; padding: 20px; font-weight: bold;">
             Nenhum cliente cadastrado no momento.
         </td>
     </tr>
 
-    <!-- Loop através dos clientes -->
     <tr th:each="cliente : ${clientes}">
         <td th:text="${cliente.id}"></td>
         <td th:text="${cliente.nome}"></td>
-        <td th:text="${cliente.email}"></td>
         <td th:text="${cliente.telefone}"></td>
-        <td th:text="${cliente.cpf}"></td>
-        <td th:text="${cliente.genero}"></td>
         <td th:text="${cliente.dataNascimento}"></td>
-        <td th:text="${cliente.tipoResidencia}"></td>
-        <td th:text="${cliente.cidade}"></td>
-        <td th:text="${cliente.estado}"></td>
-        <td th:text="${cliente.bairro}"></td>
-        <td th:text="${cliente.cep}"></td>
-        <td th:text="${cliente.numero}"></td>
-        <td th:text="${cliente.bandeira}"></td>
-        <td th:text="${cliente.numeroCartao}"></td>
-        <td th:text="${cliente.dataCadastro != null ? cliente.dataCadastro.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : ''}"></td>
+        <td th:text="${cliente.cartao != null ? cliente.cartao.bandeira : ''}"></td>
+        <td th:text="${cliente.endereco != null ? cliente.endereco.cep : ''}"></td>
+
         <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
         <td>
             <div class="action-buttons">
-                <a class="btn-action btn-edit" style="text-decoration: none;" th:href="@{/editarCliente/{id}(id=${cliente.id})}">
+                <a class="btn-action btn-edit" th:href="@{/clientes/editar/{id}(id=${cliente.id})}">
                     <i class="fas fa-pencil-alt"></i>
                 </a>
-              <a class="btn-action btn-delete"
-                style="text-decoration: none; cursor: pointer;"
-                th:attr="data-id=${cliente.id}"
-                onclick="confirmarExclusao(this)">
+                <a class="btn-action btn-delete" th:attr="data-id=${cliente.id}" onclick="confirmarExclusao(this)">
                     <i class="fas fa-trash"></i>
                 </a>
-
+                <a class="btn-action btn-view" style="cursor:pointer;" 
+                   th:attr="data-id=${cliente.id}" 
+                   onclick="abrirModalCliente(this)">
+                    <i class="fas fa-eye"></i>
+                </a>
             </div>
         </td>
     </tr>
@@ -123,7 +103,7 @@
             </div>
 
             <!-- Botão para novo cliente -->
-            <a class="btn-back" href="/addCliente">
+            <a class="btn-back" href="/clientes/add">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
                 </svg>
@@ -140,43 +120,75 @@
             <a href="#">Ajuda</a>
             <a href="#">Contato</a>
         </div>
-        <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" style="color: #f0f0f0;">Matheus Abib</a>. Todos os direitos reservados.</div>
+        <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" target="_blank" style="color: #f0f0f0;">Matheus Abib</a>. Todos os direitos reservados.</div>
     </footer>
+    
 
-    <!-- Modal de confirmação -->
+<!-- Modal de confirmação -->
 <div id="modalConfirmacao" class="modal-overlay" style="display: none;">
     <div class="modal-box">
-        <h2>Confirmar Exclusão</h2>
-        <p>Tem certeza que deseja excluir este cliente?</p>
+        <div class="corner-decoration top-left"></div>
+        <div class="corner-decoration top-right"></div>
+        <div class="corner-decoration bottom-left"></div>
+        <div class="corner-decoration bottom-right"></div>
+        
+        <div class="modal-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+        </div>
+        
+        <div class="modal-content">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <p>Tem certeza que deseja excluir este cliente?</p>
+            <div class="cliente-info">
+                <strong>Cliente:</strong> <span id="clienteNome"></span><br>
+                <strong>ID:</strong> <span id="clienteId"></span>
+            </div>
+            <p style="color: #e74c3c; font-size: 0.9rem; margin-top: 10px;">
+                <i class="fas fa-info-circle"></i> Esta ação não pode ser desfeita.
+            </p>
+        </div>
+        
         <div class="modal-actions">
-            <a onclick="cancelarExclusao()" class="btn-cancelar">Cancelar</a>
-            <a id="btnConfirmarExclusao" class="btn-confirmar" href="#">Excluir</a>
+            <button onclick="cancelarExclusao()" class="btn-cancelar">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button id="btnConfirmarExclusao" class="btn-confirmar">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
         </div>
     </div>
 </div>
 
-<script>
-    function confirmarExclusao(elemento) {
-        const clienteId = elemento.getAttribute("data-id");
-        const modal = document.getElementById("modalConfirmacao");
-        const confirmarBtn = document.getElementById("btnConfirmarExclusao");
+<div id="modalCliente" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-circle"></i> Detalhes do Cliente</h2>
+        </div>
+        <div class="modal-content" id="conteudoCliente">
+            <!-- Conteúdo será preenchido via JavaScript -->
+        </div>
+        <div class="modal-actions">
+            <button onclick="fecharModalCliente()" class="btn-cancelar">Fechar</button>
+        </div>
+    </div>
+</div>
 
-        confirmarBtn.href = `/excluirCliente/${clienteId}`;
-        modal.style.display = "flex";
-    }
 
-    function cancelarExclusao() {
-        document.getElementById("modalConfirmacao").style.display = "none";
-    }
+<!-- Container para notificações toast -->
+<div id="toast-container"></div>
 
-    // Fechar modal ao clicar fora
-    window.onclick = function(event) {
-        const modal = document.getElementById("modalConfirmacao");
-        if (event.target === modal) {
-            cancelarExclusao();
-        }
-    }
-</script>
+<!-- Modal de confirmação -->
+<div id="modalConfirmacao" class="modal-overlay" style="display: none;">
+    <!-- ... conteúdo existente do modal ... -->
+</div>
+
+<div id="modalCliente" class="modal-overlay" style="display: none;">
+    <!-- ... conteúdo existente do modal ... -->
+</div>
+
+    <script th:src="@{/js/script.js}"></script>
 
 </body>
 </html>

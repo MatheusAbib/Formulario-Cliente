@@ -1,4 +1,4 @@
-:root {
+        :root {
     --correios-blue: #0033A0;
     --correios-yellow: #FFD100;
     --correios-light-blue: #E6F0FF;
@@ -9,7 +9,7 @@
     --transition: all 0.3s ease;
     --active-color: #2ecc71;
     --inactive-color: #e74c3c;
-}
+    }
 
 * {
     box-sizing: border-box;
@@ -160,7 +160,6 @@ main {
 .page-title {
     font-family: 'Poppins', sans-serif;
     color: var(--correios-blue);
-    margin-bottom: 30px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -226,8 +225,8 @@ main {
     position: relative;
     overflow: hidden;
     border: 1px solid #e0e0e0;
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 65%;
+    margin: 30px auto;
     animation: fadeInUp 0.5s ease-out;
 }
 
@@ -306,55 +305,18 @@ th {
 
 /* Configurações específicas por coluna */
 td:nth-child(1), th:nth-child(1) { /* ID */
-    min-width: 50px;
     max-width: 80px;
     text-align: center;
 }
 
 td:nth-child(2), th:nth-child(2) { /* Nome */
-    min-width: 200px;
     max-width: 380px;
 }
 
-td:nth-child(3), th:nth-child(3) { /* Email */
-    min-width: 180px;
-    max-width: 280px;
-}
-
 td:nth-child(4), th:nth-child(4){/* Telefone */
-     min-width: 135px;
     max-width: 135px;
 }
 
-td:nth-child(5), th:nth-child(5){/* CPF */
-    min-width: 135px;
-    max-width: 135px;
-}
-
-td:nth-child(6), th:nth-child(6), /* Gênero */
-td:nth-child(7), th:nth-child(7){ /* Data Pedido */
-    min-width: 110px;
-    max-width: 110px;
-}
-td:nth-child(8), th:nth-child(8), /* Residência */
-td:nth-child(13), th:nth-child(13) { /* Número */
-    min-width: 120px;
-    max-width: 150px;
-}
-
-td:nth-child(9), th:nth-child(9){/* Cidade */
-    min-width: 120px;
-    max-width: 280px;
-} 
-
-td:nth-child(10), th:nth-child(10){/* Estado */
-    min-width: 80px;
-    max-width: 100px;
-} 
-td:nth-child(11), th:nth-child(11){/* Bairro */
-    min-width: 120px;
-    max-width: 150px;
-}
 
 td:nth-child(12), th:nth-child(12), /* CEP */
 td:nth-child(14), th:nth-child(14), /* Bandeira */
@@ -363,7 +325,6 @@ td:nth-child(15), th:nth-child(15){/* N° Cartão */
     max-width: 150px;
 } 
 
-td:nth-child(16), th:nth-child(16), /* Cadastro */
 td:nth-child(17), th:nth-child(17) { /* Editado */
     min-width: 135px;
     max-width: 150px;
@@ -402,7 +363,7 @@ tr:hover {
     font-family: 'Poppins', sans-serif;
     color: var(--correios-blue);
     margin-bottom: 20px;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
     position: relative;
@@ -452,10 +413,10 @@ tr:hover {
 
 input, select {
     width: 100%;
-    padding: 12px 15px;
+    padding: 15px 15px;
     border: 1px solid #ddd;
     border-radius: var(--border-radius);
-    font-size: 0.95rem;
+    font-size: 1rem;
     color: var(--correios-dark-gray);
     background-color: white;
     transition: var(--transition);
@@ -550,8 +511,7 @@ button::after {
 .error {
     color: #d32f2f;
     font-size: 0.8rem;
-    margin-top: -15px;
-    margin-bottom: 15px;
+    margin-top: 5px;
     display: none;
     background-color: rgba(211, 47, 47, 0.05);
     padding: 8px 12px;
@@ -594,12 +554,23 @@ button::after {
 
 .btn-edit {
     background-color: var(--correios-blue);
+    text-decoration: none;
 }
 
 .btn-edit:hover {
     background-color: #002366;
     transform: scale(1.1);
 }
+
+.btn-view {
+    background-color: var(--correios-yellow);
+}
+
+.btn-view:hover {
+    background-color: #CCAA00;
+    transform: scale(1.1);
+}
+
 
 .btn-delete {
     background-color: #e74c3c;
@@ -706,6 +677,10 @@ footer {
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--correios-dark);
+}
+
+#modalCliente .modal-content::-webkit-scrollbar{
+    display: none;
 }
 
 /* Responsividade */
@@ -865,6 +840,159 @@ footer {
     text-transform: capitalize;
 }
 
+/* Modal de confirmação */
+#modalConfirmacao .modal-box {
+    background: white;
+    padding: 0;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+#modalConfirmacao .modal-header {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 20px 30px;
+    position: relative;
+}
+
+#modalConfirmacao .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#modalConfirmacao .modal-header h2 i {
+    font-size: 1.3rem;
+}
+
+#modalConfirmacao .modal-content {
+    padding: 30px;
+    text-align: center;
+}
+
+#modalConfirmacao .modal-content p {
+    font-size: 1.1rem;
+    color: var(--correios-dark-gray);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+#modalConfirmacao .warning-icon {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 20px;
+}
+
+#modalConfirmacao .cliente-info {
+    background-color: var(--correios-gray);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin: 15px 0;
+    text-align: left;
+    border-left: 4px solid var(--correios-blue);
+}
+
+#modalConfirmacao .cliente-info strong {
+    color: var(--correios-blue);
+}
+
+#modalConfirmacao .modal-actions {
+    padding: 20px 30px;
+    background-color: var(--correios-gray);
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+#modalConfirmacao .btn-cancelar {
+    background-color: #7f8c8d;
+    color: white;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+}
+
+#modalConfirmacao .btn-cancelar:hover {
+    background-color: #6c7b7d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#modalConfirmacao .btn-confirmar {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+}
+
+#modalConfirmacao .btn-confirmar:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Decoração do modal */
+#modalConfirmacao .corner-decoration {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+    border-style: solid;
+    pointer-events: none;
+}
+
+#modalConfirmacao .corner-decoration.top-left {
+    top: 10px;
+    left: 10px;
+    border-top-color: rgba(255, 255, 255, 0.5);
+    border-left-color: rgba(255, 255, 255, 0.5);
+}
+
+#modalConfirmacao .corner-decoration.top-right {
+    top: 10px;
+    right: 10px;
+    border-top-color: rgba(255, 255, 255, 0.5);
+    border-right-color: rgba(255, 255, 255, 0.5);
+}
+
+#modalConfirmacao .corner-decoration.bottom-left {
+    bottom: 10px;
+    left: 10px;
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+    border-left-color: rgba(255, 255, 255, 0.5);
+}
+
+#modalConfirmacao .corner-decoration.bottom-right {
+    bottom: 10px;
+    right: 10px;
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+    border-right-color: rgba(255, 255, 255, 0.5);
+}
+
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -878,28 +1006,128 @@ footer {
     z-index: 9999;
 }
 
-.modal-box {
+/* Modal de detalhes do cliente */
+#modalCliente .modal-box {
     background: white;
-    padding: 30px;
-    border-radius: 12px;
+    padding: 0;
+    border-radius: var(--border-radius);
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    text-align: left;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+}
+
+#modalCliente .modal-header {
+    background: linear-gradient(135deg, var(--correios-blue), var(--correios-dark));
+    color: white;
+    padding: 20px 30px;
+    position: relative;
+}
+
+#modalCliente .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#modalCliente .modal-header h2 i {
+    font-size: 1.3rem;
+}
+
+#modalCliente .modal-content {
+    padding: 30px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+#modalCliente .info-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+#modalCliente .info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#modalCliente .section-title {
     font-family: 'Poppins', sans-serif;
+    color: var(--correios-blue);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.modal-box h2 {
-    margin-bottom: 10px;
-    font-size: 22px;
-    color: #222;
+#modalCliente .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
 }
 
-.modal-box p {
-    margin-bottom: 20px;
-    color: #555;
+#modalCliente .info-item {
+    margin-bottom: 12px;
 }
 
+#modalCliente .info-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+#modalCliente .info-value {
+    font-size: 1rem;
+    color: var(--correios-dark-gray);
+    font-weight: 400;
+    word-break: break-word;
+}
+
+#modalCliente .modal-actions {
+    padding: 20px 30px;
+    background-color: var(--correios-gray);
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #e0e0e0;
+}
+
+#modalCliente .btn-cancelar {
+    background-color: var(--correios-blue);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+}
+
+#modalCliente .btn-cancelar:hover {
+    background-color: var(--correios-dark);
+    transform: translateY(-2px);
+}
+
+/* Badge para informações de cartão */
+.badge-cartao {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: var(--correios-light-blue);
+    color: var(--correios-blue);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 5px;
+}
 .modal-actions {
     display: flex;
     justify-content: space-between;
@@ -934,4 +1162,200 @@ footer {
 
 .btn-confirmar:hover {
     background-color: #c0392b;
+}
+
+
+
+/* Notificações Toast */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: slideInRight 0.3s ease forwards;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid;
+    background: white;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.toast.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+.toast-success {
+    border-left-color: var(--active-color);
+    background: linear-gradient(135deg, #f8fff9, #ffffff);
+}
+
+.toast-error {
+    border-left-color: var(--inactive-color);
+    background: linear-gradient(135deg, #fff8f8, #ffffff);
+}
+
+.toast-warning {
+    border-left-color: var(--correios-yellow);
+    background: linear-gradient(135deg, #fffdf0, #ffffff);
+}
+
+.toast-info {
+    border-left-color: var(--correios-blue);
+    background: linear-gradient(135deg, #f0f7ff, #ffffff);
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.toast-success .toast-icon {
+    background-color: var(--active-color);
+    color: white;
+}
+
+.toast-error .toast-icon {
+    background-color: var(--inactive-color);
+    color: white;
+}
+
+.toast-warning .toast-icon {
+    background-color: var(--correios-yellow);
+    color: var(--correios-dark);
+}
+
+.toast-info .toast-icon {
+    background-color: var(--correios-blue);
+    color: white;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: var(--correios-dark-gray);
+}
+
+.toast-success .toast-title {
+    color: var(--active-color);
+}
+
+.toast-error .toast-title {
+    color: var(--inactive-color);
+}
+
+.toast-warning .toast-title {
+    color: var(--correios-dark);
+}
+
+.toast-info .toast-title {
+    color: var(--correios-blue);
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    transition: var(--transition);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #ffffff;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: currentColor;
+    animation: progressBar 5s linear forwards;
+    opacity: 0.3;
+}
+
+/* Animações */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes progressBar {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
+}
+
+/* Decoração das notificações */
+.toast::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
 }
