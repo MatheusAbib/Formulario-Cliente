@@ -1,4 +1,3 @@
-// Funções para notificações toast (reutilizando do script.js)
 function showToast(type, title, message) {
     const container = document.getElementById('toast-container');
     if (!container) return;

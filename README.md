@@ -1,16 +1,6 @@
 # 📦 Sistema de Gerenciamento de Clientes - Correios+
 
-<<<<<<< HEAD
-![Tela 01](TelaInicial01.png) 
-![Tela 02](TelaInicial02.png) 
-![Listagem 01](Listagem01.png) 
-![Listagem 02](Listagem02.png) 
-![Edição 01](Edicao01.png) 
-![Lista Vazia](ListaVazia.png)
-![Modal de Exclusão](Exclusao.png)
-=======
 ![Demonstração do Projeto](/Crud.gif)
->>>>>>> recuperar-antigo
 
 ---
 
