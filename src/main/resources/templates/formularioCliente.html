@@ -144,19 +144,20 @@
         
         <div class="form-row">
             <div class="form-group floating-label-group">
-                <input type="text" id="tipoResidencia" th:field="*{endereco.tipoResidencia}" required placeholder=" ">
-                <label class="floating-label" for="tipoResidencia">Tipo de Residência</label>
-            </div>
-
-            <div class="form-group floating-label-group">
-                <input type="text" id="numero" th:field="*{endereco.numero}" required placeholder=" ">
-                <label class="floating-label" for="numero">Número</label>
-            </div>
-            <div class="form-group floating-label-group">
                 <input type="text" id="cep" th:field="*{endereco.cep}" required maxlength="9" placeholder=" ">
                 <label class="floating-label" for="cep">CEP</label>
                 <div class="error" id="cepError"></div>
             </div>
+            <div class="form-group floating-label-group">
+                <input type="text" id="bairro" th:field="*{endereco.bairro}" required placeholder=" ">
+                <label class="floating-label" for="bairro">Bairro</label>
+            </div>
+            <div class="form-group floating-label-group">
+                <input type="text" id="enderecoEntrega" th:field="*{endereco.enderecoEntrega}" required placeholder=" ">
+                <label class="floating-label" for="enderecoEntrega">Endereço de Entrega</label>
+            </div>
+
+
         </div>
 
         <div class="form-row">
@@ -186,12 +187,12 @@
 
         <div class="form-row">
             <div class="form-group floating-label-group">
-                <input type="text" id="bairro" th:field="*{endereco.bairro}" required placeholder=" ">
-                <label class="floating-label" for="bairro">Bairro</label>
+                <input type="text" id="tipoResidencia" th:field="*{endereco.tipoResidencia}" required placeholder=" ">
+                <label class="floating-label" for="tipoResidencia">Tipo de Residência</label>
             </div>
             <div class="form-group floating-label-group">
-                <input type="text" id="enderecoEntrega" th:field="*{endereco.enderecoEntrega}" required placeholder=" ">
-                <label class="floating-label" for="enderecoEntrega">Endereço de Entrega</label>
+                <input type="text" id="numero" th:field="*{endereco.numero}" required placeholder=" ">
+                <label class="floating-label" for="numero">Número</label>
             </div>
 
             <div class="form-group floating-label-group">

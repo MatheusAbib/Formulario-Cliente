@@ -1,3 +1,49 @@
+function mostrarLoaderCEP() {
+    const cepInput = document.getElementById('cep');
+    if (!cepInput) return;
+    
+    // Remover loader existente se houver
+    esconderLoaderCEP();
+    
+    atualizarEstadoCEP(true);
+    
+    const loader = document.createElement('div');
+    loader.id = 'cep-loader';
+    loader.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando endereço...';
+    loader.style.cssText = `
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, var(--correios-light-blue), #ffffff);
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        font-size: 0.85rem;
+        color: var(--correios-blue);
+        margin-bottom: 8px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 2px solid var(--correios-blue);
+        box-shadow: 0 4px 12px rgba(0, 51, 160, 0.15);
+        font-weight: 500;
+    `;
+    
+    const parent = cepInput.parentNode;
+    parent.style.position = 'relative';
+    parent.appendChild(loader);
+}
+
+function esconderLoaderCEP() {
+    const loader = document.getElementById('cep-loader');
+    if (loader) {
+        loader.remove();
+    }
+    
+    atualizarEstadoCEP(false);
+}
+
 function showToast(type, title, message) {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -91,20 +137,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const cepInput = document.getElementById('cep');
-    if (cepInput) {
-        cepInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
+const cepInput = document.getElementById('cep');
+if (cepInput) {
+    let cepTimeout;
+    
+    cepInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.length > 8) value = value.substring(0, 8);
+        
+        if (value.length > 5) {
+            value = value.replace(/(\d{5})(\d{1,3})/, '$1-$2');
+        }
+        
+        e.target.value = value;
+        
+        clearTimeout(cepTimeout);
+        
+        if (value.replace(/\D/g, '').length === 8) {
+            if (window.buscandoCEP) return;
             
-            if (value.length > 8) value = value.substring(0, 8);
-            
-            if (value.length > 5) {
-                value = value.replace(/(\d{5})(\d{1,3})/, '$1-$2');
-            }
-            
-            e.target.value = value;
-        });
-    }
+            cepTimeout = setTimeout(() => {
+                buscarCep(value);
+            }, 800); 
+        }
+    });
+    
+    cepInput.addEventListener('blur', function() {
+        const cepLimpo = this.value.replace(/\D/g, '');
+        if (cepLimpo.length === 8 && !window.buscandoCEP) {
+            buscarCep(cepLimpo);
+        }
+    });
+}
 
     const numeroCartaoInput = document.getElementById('numeroCartao');
     if (numeroCartaoInput) {
@@ -422,3 +487,174 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmarSenhaInput.parentNode.insertBefore(infoDiv, confirmarSenhaInput.nextSibling);
     }
 });
+
+function buscarCep(cep) {
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    if (cepLimpo.length !== 8) {
+        return;
+    }
+    
+    // Prevenir múltiplas chamadas simultâneas
+    if (window.buscandoCEP) return;
+    window.buscandoCEP = true;
+    
+    mostrarLoaderCEP();
+    
+    const url = `https://viacep.com.br/ws/${cepLimpo}/json/`;
+    
+    // Tempo mínimo de 1.5 segundos para mostrar o loader
+    const startTime = Date.now();
+    
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error('Erro na requisição');
+            return response.json();
+        })
+        .then(data => {
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, 1500 - elapsedTime);
+            
+            setTimeout(() => {
+                esconderLoaderCEP();
+                
+                if (data.erro) {
+                    showToast('error', 'CEP não encontrado', 'O CEP informado não foi encontrado.');
+                    window.buscandoCEP = false;
+                    return;
+                }
+                
+                preencherEnderecoComCEP(data);
+                window.buscandoCEP = false;
+            }, remainingTime);
+        })
+        .catch(error => {
+            console.error('Erro ao buscar CEP:', error);
+            
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, 1500 - elapsedTime);
+            
+            setTimeout(() => {
+                esconderLoaderCEP();
+                showToast('error', 'Erro ao buscar CEP', 'Não foi possível buscar o endereço. Tente novamente.');
+                window.buscandoCEP = false;
+            }, remainingTime);
+        });
+}
+
+function preencherEnderecoComCEP(data) {
+    const logradouroInput = document.getElementById('enderecoEntrega');
+    const bairroInput = document.getElementById('bairro');
+    const cidadeInput = document.getElementById('cidade');
+    const estadoSelect = document.getElementById('estado');
+    
+    let camposPreenchidos = 0;
+    
+    if (logradouroInput) {
+        logradouroInput.value = data.logradouro || '';
+        if (data.logradouro) camposPreenchidos++;
+    }
+    
+    if (bairroInput) {
+        bairroInput.value = data.bairro || '';
+        if (data.bairro) camposPreenchidos++;
+    }
+    
+    if (cidadeInput) {
+        cidadeInput.value = data.localidade || '';
+        if (data.localidade) camposPreenchidos++;
+    }
+    
+    if (estadoSelect) {
+        const estadoValue = data.uf || '';
+        estadoSelect.value = estadoValue;
+        
+        const floatingLabel = estadoSelect.parentNode.querySelector('.floating-label');
+        if (estadoValue && floatingLabel) {
+            floatingLabel.classList.add('filled');
+            camposPreenchidos++;
+        }
+    }
+    
+    if (camposPreenchidos > 0) {
+        setTimeout(() => {
+            showToast('success', 'CEP encontrado!', 'Endereço preenchido automaticamente.');
+        }, 100);
+    }
+}
+
+// Adicionar botão de busca manual
+const cepGroup = cepInput.parentNode;
+cepGroup.style.position = 'relative';
+
+// Verificar se o botão já existe
+if (!cepGroup.querySelector('.cep-search-btn')) {
+    const buscarBtn = document.createElement('button');
+    buscarBtn.type = 'button';
+    buscarBtn.className = 'cep-search-btn';
+    buscarBtn.innerHTML = '<i class="fas fa-search"></i>';
+    buscarBtn.style.cssText = `
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--correios-blue);
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 5px;
+        transition: color 0.3s;
+        z-index: 5;
+    `;
+    
+    // Estilo hover
+    buscarBtn.addEventListener('mouseenter', function() {
+        this.style.color = 'var(--correios-dark)';
+    });
+    
+    buscarBtn.addEventListener('mouseleave', function() {
+        this.style.color = 'var(--correios-blue)';
+    });
+    
+    buscarBtn.addEventListener('click', function() {
+        const cepValue = cepInput.value.replace(/\D/g, '');
+        if (cepValue.length === 8 && !window.buscandoCEP) {
+            buscarCep(cepValue);
+        } else if (cepValue.length !== 8) {
+            showToast('error', 'CEP inválido', 'Digite um CEP com 8 dígitos.');
+            cepInput.focus();
+        }
+    });
+    
+    cepGroup.appendChild(buscarBtn);
+    
+    // Ajustar padding do input para não sobrepor o botão
+    cepInput.style.paddingRight = '40px';
+}
+
+// Adicionar esta função para atualizar o visual durante a busca
+function atualizarEstadoCEP(buscando) {
+    const cepInput = document.getElementById('cep');
+    const buscarBtn = document.querySelector('.cep-search-btn');
+    
+    if (!cepInput) return;
+    
+    if (buscando) {
+        cepInput.style.borderColor = 'var(--correios-yellow)';
+        cepInput.style.backgroundColor = '#fffdf0';
+        
+        if (buscarBtn) {
+            buscarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            buscarBtn.style.cursor = 'not-allowed';
+        }
+    } else {
+        cepInput.style.borderColor = '';
+        cepInput.style.backgroundColor = '';
+        
+        if (buscarBtn) {
+            buscarBtn.innerHTML = '<i class="fas fa-search"></i>';
+            buscarBtn.style.cursor = 'pointer';
+        }
+    }
+}
