@@ -34,6 +34,103 @@
             <h1>Lista de Clientes</h1>
         </div>
 
+
+        <!-- Container de Filtros -->
+<div class="filters-container">
+    <div class="filters-header">
+        <h3><i class="fas fa-filter"></i> Filtros de Busca</h3>
+        <div class="filters-subtitle">Pesquise clientes por diferentes critérios</div>
+    </div>
+    
+   <form id="filtroForm" method="get" action="/clientes" class="filters-form">
+    <div class="filters-grid">
+        <!-- Nome -->
+        <div class="filter-group">
+            <label for="filtroNome">
+                <i class="fas fa-user"></i> Nome
+            </label>
+            <input type="text" 
+                   id="filtroNome" 
+                   name="nome" 
+                   th:value="${param.nome}"
+                   placeholder="Digite o nome completo"
+                   class="filter-input"
+                   maxlength="100">
+            <div class="filter-hint">Busca por nome completo</div>
+        </div>
+        
+        <!-- Telefone -->
+        <div class="filter-group">
+            <label for="filtroTelefone">
+                <i class="fas fa-phone"></i> Telefone
+            </label>
+            <input type="text" 
+                   id="filtroTelefone" 
+                   name="telefone" 
+                   th:value="${param.telefone}"
+                   placeholder="(00) 00000-0000"
+                   class="filter-input telefone-mask"
+                   maxlength="15">
+            <div class="filter-hint">Buscar por telefone</div>
+        </div>
+        
+        <!-- CPF -->
+        <div class="filter-group">
+            <label for="filtroCpf">
+                <i class="fas fa-id-card"></i> CPF
+            </label>
+            <input type="text" 
+                   id="filtroCpf" 
+                   name="cpf" 
+                   th:value="${param.cpf}"
+                   placeholder="000.000.000-00"
+                   class="filter-input cpf-mask"
+                   maxlength="14">
+            <div class="filter-hint">Buscar por CPF</div>
+        </div>
+        
+        <!-- CEP -->
+        <div class="filter-group">
+            <label for="filtroCep">
+                <i class="fas fa-map-marker-alt"></i> CEP
+            </label>
+            <input type="text" 
+                   id="filtroCep" 
+                   name="cep" 
+                   th:value="${param.cep}"
+                   placeholder="00000-000"
+                   class="filter-input cep-mask"
+                   maxlength="9">
+            <div class="filter-hint">Buscar por CEP</div>
+        </div>
+    </div>
+    
+    <div class="filters-actions">
+        <button type="submit" class="btn-filter btn-apply">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+        <a href="/clientes" class="btn-filter btn-clear">
+            <i class="fas fa-eraser"></i> Limpar Filtros
+        </a>
+    </div>
+    
+    <input type="hidden" name="pagina" th:value="${paginaAtual}">
+    <input type="hidden" name="tamanho" th:value="${tamanhoPagina}">
+</form>
+    
+    <div class="filters-info" th:if="${param.nome != null or param.telefone != null or param.cpf != null or param.cep != null}">
+        <i class="fas fa-info-circle"></i>
+        <span>
+            Filtros ativos: 
+            <span th:if="${param.nome != null}">Nome: <strong th:text="${param.nome}"></strong></span>
+            <span th:if="${param.telefone != null}">Telefone: <strong th:text="${param.telefone}"></strong></span>
+            <span th:if="${param.cpf != null}">CPF: <strong th:text="${param.cpf}"></strong></span>
+            <span th:if="${param.cep != null}">CEP: <strong th:text="${param.cep}"></strong></span>
+        </span>
+    </div>
+</div>
+
+
         <div class="table-container">
             <div class="paper-clip top"></div>
             <div class="paper-clip left"></div>
@@ -42,14 +139,25 @@
             <div class="corner-decoration bottom-left"></div>
             <div class="corner-decoration bottom-right"></div>
 
-            <div class="table-scroll-container">
-                <table>
+                        <a class="btn-back" href="/clientes/add">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Novo Cliente
+            </a>
+
+                <div class="table-scroll-container">
+                    <div class="table-loader" id="tableLoader" style="display: none;">
+                        <div class="table-loader-spinner"></div>
+                        <div class="table-loader-text">Carregando clientes...</div>
+                    </div>
+                    <table>
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Nome</th>
                             <th>Telefone</th>
-                            <th>Nascimento</th>
+                            <th>CPF</th>
                             <th>Bandeira</th>
                             <th>CEP</th>
                             <th>Editado</th>
@@ -67,7 +175,7 @@
                             <td th:text="${cliente.id}"></td>
                             <td th:text="${cliente.nome}"></td>
                             <td th:text="${cliente.telefone}"></td>
-                            <td th:text="${cliente.dataNascimento}"></td>
+                            <td th:text="${cliente.cpf}"></td>
                             <td th:text="${cliente.cartao != null ? cliente.cartao.bandeira : ''}"></td>
                             <td th:text="${cliente.endereco != null ? cliente.endereco.cep : ''}"></td>
                             <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
@@ -91,10 +199,8 @@
                 </table>
             </div>
 
-            <!-- Paginação Simples -->
 
-<!-- Paginação Simples -->
-<div class="pagination-with-size" th:if="${totalItens > 0}">
+<div class="pagination-with-size">
     <div th:if="${totalPaginas > 1}" class="pagination-container">
         <div class="pagination-info">
             Mostrando
@@ -103,7 +209,6 @@
         </div>
         
         <div class="pagination-controls">
-            <!-- Primeira página -->
             <a th:if="${paginaAtual > 0}"
                th:href="@{/clientes(pagina=0, tamanho=${tamanhoPagina})}"
                class="pagination-btn">
@@ -113,7 +218,6 @@
                 <i class="fas fa-angle-double-left"></i>
             </span>
             
-            <!-- Página anterior -->
             <a th:if="${paginaAtual > 0}"
                th:href="@{/clientes(pagina=${paginaAtual - 1}, tamanho=${tamanhoPagina})}"
                class="pagination-btn">
@@ -123,7 +227,6 @@
                 <i class="fas fa-angle-left"></i>
             </span>
             
-            <!-- Números de página -->
             <div class="pagination-numbers">
                 <span th:each="pagina : ${#numbers.sequence(0, totalPaginas - 1)}">
                     <a th:if="${pagina >= paginaAtual - 2 and pagina <= paginaAtual + 2 or totalPaginas <= 7}"
@@ -136,7 +239,6 @@
                 </span>
             </div>
             
-            <!-- Próxima página -->
             <a th:if="${paginaAtual < totalPaginas - 1}"
                th:href="@{/clientes(pagina=${paginaAtual + 1}, tamanho=${tamanhoPagina})}"
                class="pagination-btn">
@@ -146,7 +248,6 @@
                 <i class="fas fa-angle-right"></i>
             </span>
             
-            <!-- Última página -->
             <a th:if="${paginaAtual < totalPaginas - 1}"
                th:href="@{/clientes(pagina=${totalPaginas - 1}, tamanho=${tamanhoPagina})}"
                class="pagination-btn">
@@ -157,36 +258,37 @@
             </span>
         </div>
     </div>
-    <div class="pagination-size-wrapper">
-
-    <div class="pagination-size">
-        <div class="pagination-size-header">
-            <i class="fas fa-sliders-h"></i>
-            <span>Exibir</span>
+    
+    <div th:if="${totalPaginas <= 1}" class="pagination-container">
+        <div class="pagination-info-simple">
+            <i class="fas fa-info-circle"></i>
+            <span th:if="${totalItens > 0}">
+                Mostrando todos os <span th:text="${totalItens}"></span> clientes cadastrados
+            </span>
+            <span th:if="${totalItens == 0}">
+                Nenhum cliente encontrado
+            </span>
         </div>
-        
-        <div class="size-selector">
-            <select id="tamanhoPagina" th:attr="data-current=${tamanhoPagina}">
-                <option value="5">5 itens</option>
-                <option value="10">10 itens</option>
-                <option value="20">20 itens</option>
-                <option value="50">50 itens</option>
-            </select>
-        </div>
-
     </div>
     
+    <div class="pagination-size-wrapper">
+        <div class="pagination-size">
+            <div class="pagination-size-header">
+                <i class="fas fa-sliders-h"></i>
+                <span>Exibir</span>
+            </div>
+            
+            <div class="size-selector">
+                <select id="tamanhoPagina" th:attr="data-current=${tamanhoPagina}">
+                    <option value="5">5 itens</option>
+                    <option value="10">10 itens</option>
+                    <option value="20">20 itens</option>
+                    <option value="50">50 itens</option>
+                </select>
+            </div>
+        </div>
     </div>
 </div>
-
-
-            <a class="btn-back" href="/clientes/add">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                Adicionar Novo Cliente
-            </a>
-        </div>
     </main>
 
  <div id="modalConfirmacao" class="modal-overlay" style="display: none;">
@@ -251,6 +353,7 @@
         <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" target="_blank" style="color: #f0f0f0;">Matheus Abib</a>. Todos os direitos reservados.</div>
     </footer>
     <script th:src="@{/js/script.js}"></script>
+
 
 </body>
 </html>

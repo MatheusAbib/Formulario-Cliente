@@ -51,18 +51,19 @@ public class ClienteController {
 public String listarClientes(
         @RequestParam(defaultValue = "0") int pagina,
         @RequestParam(defaultValue = "10") int tamanho,
+        @RequestParam(required = false) String nome,
+        @RequestParam(required = false) String telefone,
+        @RequestParam(required = false) String cpf,
+        @RequestParam(required = false) String cep,
         Model model) {
     
-    Page<Cliente> paginaClientes = clienteService.listarClientesPaginados(pagina, tamanho);
+    Page<Cliente> paginaClientes = clienteService.filtrarClientes(nome, telefone, cpf, cep, pagina, tamanho);
     
     model.addAttribute("clientes", paginaClientes.getContent());
     model.addAttribute("paginaAtual", pagina);
     model.addAttribute("totalPaginas", paginaClientes.getTotalPages());
     model.addAttribute("totalItens", paginaClientes.getTotalElements());
     model.addAttribute("tamanhoPagina", tamanho);
-    
-    model.addAttribute("parametrosAtuais", 
-        "?pagina=" + pagina + "&tamanho=" + tamanho);
     
     return "clientes";
 }

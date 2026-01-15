@@ -27,6 +27,29 @@ public class ClienteService {
         return clienteRepository.findAll(pageable);
     }
 
+    public Page<Cliente> filtrarClientes(String nome, String telefone, String cpf, String cep, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        
+        if (nome != null && !nome.isEmpty()) {
+            return clienteRepository.findByNomeContainingIgnoreCase(nome, pageable);
+        }
+        
+        // Filtra por telefone
+        if (telefone != null && !telefone.isEmpty()) {
+            return clienteRepository.findByTelefone(telefone, pageable);
+        }
+        
+        if (cpf != null && !cpf.isEmpty()) {
+            return clienteRepository.findByCpf(cpf, pageable);
+        }
+        
+        if (cep != null && !cep.isEmpty()) {
+            return clienteRepository.findByEnderecoCep(cep, pageable);
+        }
+        
+        return clienteRepository.findAll(pageable);
+    }
+
     public Iterable<Cliente> listarClientes() {
         return clienteRepository.findAll();
     }
