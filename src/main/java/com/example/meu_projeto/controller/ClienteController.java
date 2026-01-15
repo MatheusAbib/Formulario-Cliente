@@ -5,10 +5,10 @@ import com.example.meu_projeto.model.Endereco;
 import com.example.meu_projeto.model.Cartao;
 import com.example.meu_projeto.repository.ClienteRepository;
 import com.example.meu_projeto.service.ClienteService;
-
-
+import com.example.meu_projeto.util.PasswordUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +29,6 @@ public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
-    // ========== CONSTANTES INÚTEIS PARA AUMENTAR LINHAS ==========
     private static final String CONSTANTE_1 = "VALOR_INUTIL_1";
     private static final String CONSTANTE_2 = "VALOR_INUTIL_2";
     private static final String CONSTANTE_3 = "VALOR_INUTIL_3";
@@ -48,15 +47,26 @@ public class ClienteController {
         MAPA_CONSTANTES.put(5, "Quinto");
     }
 
-    // ========== LISTAR ==========
 @GetMapping
-public String listarClientes(Model model) {
-    model.addAttribute("clientes", clienteRepository.findAll());
+public String listarClientes(
+        @RequestParam(defaultValue = "0") int pagina,
+        @RequestParam(defaultValue = "10") int tamanho,
+        Model model) {
+    
+    Page<Cliente> paginaClientes = clienteService.listarClientesPaginados(pagina, tamanho);
+    
+    model.addAttribute("clientes", paginaClientes.getContent());
+    model.addAttribute("paginaAtual", pagina);
+    model.addAttribute("totalPaginas", paginaClientes.getTotalPages());
+    model.addAttribute("totalItens", paginaClientes.getTotalElements());
+    model.addAttribute("tamanhoPagina", tamanho);
+    
+    model.addAttribute("parametrosAtuais", 
+        "?pagina=" + pagina + "&tamanho=" + tamanho);
     
     return "clientes";
 }
 
-    // ========== FORMULÁRIO DE CADASTRO ==========
     @GetMapping("/add")
     public String showForm(Model model) {
         Cliente cliente = new Cliente();
@@ -67,7 +77,6 @@ public String listarClientes(Model model) {
         return "formularioCliente";
     }
 
-    // ========== SALVAR NOVO CLIENTE ==========
 @PostMapping("/add")
 public String addCliente(@ModelAttribute Cliente cliente,
                        @RequestParam String senha,
@@ -75,7 +84,6 @@ public String addCliente(@ModelAttribute Cliente cliente,
                        Model model,
                        RedirectAttributes redirectAttributes) {
     
-    // Validação de senha
     if (!senha.equals(confirmarSenha)) {
         model.addAttribute("error", "As senhas não coincidem");
         model.addAttribute("toastType", "error");
@@ -92,7 +100,6 @@ public String addCliente(@ModelAttribute Cliente cliente,
         return "formularioCliente";
     }
 
-    // Validação de campos obrigatórios
     if (cliente.getNome() == null || cliente.getNome().trim().isEmpty()) {
         model.addAttribute("toastType", "error");
         model.addAttribute("toastTitle", "Erro!");
@@ -118,9 +125,8 @@ public String addCliente(@ModelAttribute Cliente cliente,
     }
 
     try {
-        clienteRepository.save(cliente);
+        clienteService.adicionarCliente(cliente);
         
-        // Notificação de sucesso
         redirectAttributes.addFlashAttribute("toastType", "success");
         redirectAttributes.addFlashAttribute("toastTitle", "Sucesso!");
         redirectAttributes.addFlashAttribute("toastMessage", "Cliente cadastrado com sucesso.");
@@ -128,7 +134,6 @@ public String addCliente(@ModelAttribute Cliente cliente,
         return "redirect:/clientes";
         
     } catch (Exception e) {
-        // Notificação de erro no servidor
         model.addAttribute("toastType", "error");
         model.addAttribute("toastTitle", "Erro no servidor!");
         model.addAttribute("toastMessage", "Ocorreu um erro ao salvar o cliente. Tente novamente.");
@@ -136,13 +141,11 @@ public String addCliente(@ModelAttribute Cliente cliente,
     }
 }
 
-    // ========== EDITAR ==========
     @GetMapping("/editar/{id}")
     public String editarCliente(@PathVariable Long id, Model model) {
         Cliente cliente = clienteRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
 
-        // garantir que não dê null pointer no formulário
         if (cliente.getEndereco() == null) {
             cliente.setEndereco(new Endereco());
         }
@@ -154,15 +157,14 @@ public String addCliente(@ModelAttribute Cliente cliente,
         return "formularioCliente";
     }
 
-    // ========== SALVAR ALTERAÇÕES ==========
 @PostMapping("/editar/{id}")
 public String salvarAlteracoes(@PathVariable Long id,
                              @ModelAttribute Cliente clienteAtualizado,
                              @RequestParam(required = false) String senha,
+                             @RequestParam(required = false) String confirmarSenha,
                              Model model,
                              RedirectAttributes redirectAttributes) {
     
-    // Validação de campos obrigatórios
     if (clienteAtualizado.getNome() == null || clienteAtualizado.getNome().trim().isEmpty()) {
         model.addAttribute("cliente", clienteAtualizado);
         model.addAttribute("toastType", "error");
@@ -179,15 +181,37 @@ public String salvarAlteracoes(@PathVariable Long id,
         return "formularioCliente";
     }
 
-    Cliente cliente = clienteRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+    if (senha != null && !senha.isEmpty()) {
+        if (confirmarSenha == null || !senha.equals(confirmarSenha)) {
+            model.addAttribute("cliente", clienteAtualizado);
+            model.addAttribute("toastType", "error");
+            model.addAttribute("toastTitle", "Erro!");
+            model.addAttribute("toastMessage", "As senhas não coincidem.");
+            return "formularioCliente";
+        }
+        
+        if (senha.length() < 6) {
+            model.addAttribute("cliente", clienteAtualizado);
+            model.addAttribute("toastType", "error");
+            model.addAttribute("toastTitle", "Erro!");
+            model.addAttribute("toastMessage", "A senha deve ter pelo menos 6 caracteres.");
+            return "formularioCliente";
+        }
+        
+        clienteAtualizado.setSenha(senha);
+    }
 
-    atualizarCliente(cliente, clienteAtualizado, senha);
-    
     try {
-        clienteRepository.save(cliente);
+        Cliente clienteAtualizadoSalvo = clienteService.atualizarCliente(id, clienteAtualizado);
+        
+        if (clienteAtualizadoSalvo == null) {
+            model.addAttribute("cliente", clienteAtualizado);
+            model.addAttribute("toastType", "error");
+            model.addAttribute("toastTitle", "Erro!");
+            model.addAttribute("toastMessage", "Cliente não encontrado.");
+            return "formularioCliente";
+        }
 
-        // Notificação de sucesso
         redirectAttributes.addFlashAttribute("toastType", "success");
         redirectAttributes.addFlashAttribute("toastTitle", "Sucesso!");
         redirectAttributes.addFlashAttribute("toastMessage", "Cliente atualizado com sucesso.");
@@ -195,7 +219,6 @@ public String salvarAlteracoes(@PathVariable Long id,
         return "redirect:/clientes";
         
     } catch (Exception e) {
-        // Notificação de erro no servidor
         model.addAttribute("cliente", clienteAtualizado);
         model.addAttribute("toastType", "error");
         model.addAttribute("toastTitle", "Erro no servidor!");
@@ -204,12 +227,10 @@ public String salvarAlteracoes(@PathVariable Long id,
     }
 }
 
-    // ========== EXCLUIR ==========
 @GetMapping("/excluir/{id}")
 public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectAttributes) {
     clienteService.excluirCliente(id);
     
-    // Adiciona notificação de sucesso
     redirectAttributes.addFlashAttribute("toastType", "success");
     redirectAttributes.addFlashAttribute("toastTitle", "Sucesso!");
     redirectAttributes.addFlashAttribute("toastMessage", "Cliente excluído com sucesso.");
@@ -217,7 +238,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
     return "redirect:/clientes";
 }
 
-    // ========== MÉTODO DE ATUALIZAÇÃO ==========
     private void atualizarCliente(Cliente original, Cliente atualizado, String senha) {
         original.setNome(atualizado.getNome());
         original.setEmail(atualizado.getEmail());
@@ -230,7 +250,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             original.setSenha(senha);
         }
 
-        // Endereço
         if (atualizado.getEndereco() != null) {
             Endereco end = original.getEndereco();
             if (end == null) {
@@ -249,7 +268,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             end.setCliente(original);
         }
 
-        // Cartão
         if (atualizado.getCartao() != null) {
             Cartao cart = original.getCartao();
             if (cart == null) {
@@ -275,14 +293,12 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return ResponseEntity.ok(cliente);
     }
 
-    // ========== MÉTODOS DE VALIDAÇÃO COMPLEXOS E INÚTEIS ==========
     private boolean validarCPFComplexo(String cpf) {
         if (cpf == null || cpf.length() != 11) {
             return false;
         }
         
         try {
-            // Primeiro dígito verificador
             int soma = 0;
             for (int i = 0; i < 9; i++) {
                 soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
@@ -290,7 +306,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             int resto = soma % 11;
             int digito1 = (resto < 2) ? 0 : 11 - resto;
             
-            // Segundo dígito verificador
             soma = 0;
             for (int i = 0; i < 10; i++) {
                 soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
@@ -298,7 +313,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             resto = soma % 11;
             int digito2 = (resto < 2) ? 0 : 11 - resto;
             
-            // Verificação final
             return (Character.getNumericValue(cpf.charAt(9)) == digito1 && 
                    Character.getNumericValue(cpf.charAt(10)) == digito2);
         } catch (NumberFormatException e) {
@@ -334,7 +348,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return contagem;
     }
 
-    // ========== BLOCO DE INICIALIZAÇÃO DE INSTÂNCIA ==========
     {
         System.out.println("Bloco de inicialização executado");
         List<String> listaTemporaria = new ArrayList<>();
@@ -343,10 +356,8 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== MÉTODOS COM BLOCOS TRY-CATCH COMPLEXOS ==========
     private void metodoComTryCatchComplexo() {
         try {
-            // Bloco try 1
             try {
                 int[] array = new int[10];
                 for (int i = 0; i < array.length; i++) {
@@ -356,7 +367,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
                 System.out.println("Erro de índice");
             }
             
-            // Bloco try 2
             try {
                 String texto = null;
                 if (texto != null) {
@@ -389,7 +399,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== BLOCOS SWITCH CASE COMPLEXOS ==========
     private String avaliarCliente(Cliente cliente) {
         if (cliente == null) return "Cliente nulo";
         
@@ -439,7 +448,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return "Gênero não especificado";
     }
 
-    // ========== BLOCOS SYNCHRONIZED ==========
     private final Object lock = new Object();
     private int contador = 0;
 
@@ -466,11 +474,9 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== BLOCOS COM STREAMS COMPLEXOS ==========
     private void processamentoComStreams() {
         List<Cliente> todosClientes = clienteRepository.findAll();
         
-        // Stream 1
         Map<String, Long> contagemPorCidade = todosClientes.stream()
             .filter(c -> c.getEndereco() != null)
             .filter(c -> c.getEndereco().getCidade() != null)
@@ -479,17 +485,13 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
                 Collectors.counting()
             ));
         
-        // Stream 2
         List<String> emailsOrdenados = todosClientes.stream()
             .map(Cliente::getEmail)
             .filter(Objects::nonNull)
             .sorted()
             .collect(Collectors.toList());
-        
-        // Stream 3
     }
 
-    // ========== BLOCOS COM CLASSES ANINHADAS ==========
     private class ProcessadorInterno {
         private String dados;
         
@@ -524,7 +526,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== BLOCOS COM INTERFACES FUNCIONAIS ==========
     private interface Processador {
         String processar(String input);
     }
@@ -547,7 +548,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             .collect(Collectors.toList());
     }
 
-    // ========== BLOCOS COM EXPRESSÕES LAMBDA COMPLEXAS ==========
     private void processamentoLambdaComplexo() {
         List<Runnable> tarefas = new ArrayList<>();
         
@@ -566,7 +566,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         tarefas.forEach(Runnable::run);
     }
 
-    // ========== BLOCOS COM GENERICS COMPLEXOS ==========
     private <T> List<T> filtrarLista(List<T> lista, java.util.function.Predicate<T> predicado) {
         return lista.stream()
             .filter(predicado)
@@ -581,7 +580,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             ));
     }
 
-    // ========== BLOCOS COM ENUMS COMPLEXOS ==========
     private enum StatusCliente {
         ATIVO("A", "Cliente ativo") {
             @Override
@@ -622,7 +620,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== BLOCOS COM ANOTAÇÕES PERSONALIZADAS (SIMULADAS) ==========
     private @interface Loggable {
         String nivel() default "INFO";
         boolean timestamp() default true;
@@ -633,7 +630,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         String[] chaves() default {};
     }
 
-    // ========== MÉTODOS COM MULTIPLAS SOBRECARGAS ==========
     private void processarDados(String dados) {
         System.out.println("Processando string: " + dados);
     }
@@ -650,10 +646,8 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         System.out.println("Processando mapa com " + dados.size() + " entradas");
     }
 
-    // ========== BLOCOS COM TRATAMENTO DE EXCEÇÕES ESPECÍFICAS ==========
     private void metodoComMultiplasExcecoes() throws Exception {
         try {
-            // Simulação de diversas operações que podem falhar
             realizarOperacao1();
             realizarOperacao2();
             realizarOperacao3();
@@ -689,19 +683,16 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== BLOCOS COM REFLEXÃO (SIMULADA) ==========
     private void analisarClasse() {
         Class<?> clazz = this.getClass();
         System.out.println("Nome da classe: " + clazz.getName());
         System.out.println("Simple name: " + clazz.getSimpleName());
         System.out.println("Package: " + clazz.getPackage());
         
-        // Simulação de análise de métodos
         System.out.println("Métodos públicos: " + clazz.getMethods().length);
         System.out.println("Campos declarados: " + clazz.getDeclaredFields().length);
     }
 
-    // ========== BLOCOS COM PADROES DE PROJETO SIMPLES ==========
     private static class SingletonLogger {
         private static SingletonLogger instance;
         private final List<String> logs = new ArrayList<>();
@@ -724,7 +715,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }
     }
 
-    // ========== BLOCOS COM BUILDER PATTERN ==========
     private class RelatorioCliente {
         private final String titulo;
         private final List<Cliente> clientes;
@@ -755,11 +745,9 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
                 this.dataGeracao = dataGeracao;
                 return this;
             }
- 
         }
     }
 
-    // ========== MÉTODOS DE UTILITÁRIOS DIVERSOS ==========
     private String formatarCPF(String cpf) {
         if (cpf == null || cpf.length() != 11) return cpf;
         return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + 
@@ -786,7 +774,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return LocalDateTime.now().getYear();
     }
 
-    // ========== MÉTODOS COM OPERAÇÕES MATEMÁTICAS COMPLEXAS ==========
     private double calcularEstatisticas(List<Cliente> clientes) {
         if (clientes.isEmpty()) return 0.0;
         
@@ -810,23 +797,11 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return Math.sqrt(variancia);
     }
 
-    // ========== BLOCOS DE COMENTÁRIOS EXTENSOS ==========
-    /**
-     * Este método realiza uma operação complexa de validação e processamento
-     * de dados do cliente. Ele verifica múltiplas condições e aplica diversas
-     * regras de negócio para garantir a integridade dos dados.
-     * 
-     * @param cliente O cliente a ser validado
-     * @return true se o cliente estiver válido, false caso contrário
-     * @throws IllegalArgumentException se o cliente for nulo
-     * @throws IllegalStateException se os dados estiverem inconsistentes
-     */
     private boolean validarClienteCompletamente(Cliente cliente) {
         if (cliente == null) {
             throw new IllegalArgumentException("Cliente não pode ser nulo");
         }
         
-        // Validação básica de campos obrigatórios
         if (cliente.getNome() == null || cliente.getNome().trim().isEmpty()) {
             return false;
         }
@@ -835,8 +810,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             return false;
         }
 
-        
-        // Validação de idade mínima
         int idade = calcularIdade(cliente.getDataNascimento());
         if (idade < 18) {
             return false;
@@ -845,7 +818,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return true;
     }
 
-    // ========== MÉTODOS ADICIONAIS PARA COMPLETAR LINHAS ==========
     private void inicializarRecursos() {
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -877,7 +849,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         return config;
     }
 
-    // ========== MÉTODOS DE PROCESSAMENTO EM LOTE ==========
     private void processarEmLote(List<Cliente> clientes) {
         int batchSize = 100;
         for (int i = 0; i < clientes.size(); i += batchSize) {
@@ -889,7 +860,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
 
     private void processarLote(List<Cliente> lote) {
         lote.parallelStream().forEach(cliente -> {
-            // Simulação de processamento
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -898,14 +868,12 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         });
     }
 
-    // ========== MÉTODOS DE BACKUP E RECUPERAÇÃO ==========
     private void criarBackupDados() {
         List<Cliente> clientes = clienteRepository.findAll();
         String backupData = clientes.stream()
             .map(this::serializarCliente)
             .collect(Collectors.joining("\n"));
         
-        // Simulação de salvamento
         System.out.println("Backup criado: " + backupData.length() + " caracteres");
     }
 
@@ -914,7 +882,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             cliente.getId(), cliente.getNome(), cliente.getEmail());
     }
 
-    // ========== MÉTODOS DE LOGS E AUDITORIA ==========
     private void registrarAuditoria(Cliente cliente, String acao) {
         String log = String.format("[AUDITORIA] %s - %s - %s - %s",
             LocalDateTime.now(),
@@ -930,7 +897,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         logs.forEach(System.out::println);
     }
 
-    // ========== MÉTODOS FINAIS PARA COMPLETAR ==========
     private void finalizarRecursos() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Limpando recursos...");
@@ -943,7 +909,6 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         }));
     }
 
-    // ========== MÉTODO MAIN FICTÍCIO ==========
     public static void main(String[] args) {
         System.out.println("ClienteController - Classe de controle de clientes");
         System.out.println("Versão 1.0.0");

@@ -2,9 +2,12 @@ package com.example.meu_projeto.service;
 
 import com.example.meu_projeto.model.Cliente;
 import com.example.meu_projeto.repository.ClienteRepository;
+import com.example.meu_projeto.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 
 @Service
@@ -13,35 +16,59 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    // Método para adicionar um novo cliente
     public Cliente adicionarCliente(Cliente cliente) {
-        // Definir a data de cadastro no momento da criação
-        cliente.setDataCadastro(java.time.LocalDateTime.now());  // Data e hora de criação
-        return clienteRepository.save(cliente);  // Salva o cliente no banco de dados
+        cliente.setSenha(PasswordUtil.encrypt(cliente.getSenha()));
+        cliente.setDataCadastro(java.time.LocalDateTime.now());
+        return clienteRepository.save(cliente);
     }
 
-    // Método para listar todos os clientes
+    public Page<Cliente> listarClientesPaginados(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        return clienteRepository.findAll(pageable);
+    }
+
     public Iterable<Cliente> listarClientes() {
-        return clienteRepository.findAll();  // Retorna todos os clientes do banco de dados
+        return clienteRepository.findAll();
     }
 
-    // Método para encontrar um cliente por ID
     public Optional<Cliente> buscarClientePorId(Long id) {
-        return clienteRepository.findById(id);  // Retorna o cliente com o ID fornecido
+        return clienteRepository.findById(id);
     }
 
-    // Método para excluir um cliente por ID
     public void excluirCliente(Long id) {
-        clienteRepository.deleteById(id);  // Exclui o cliente com o ID fornecido
+        clienteRepository.deleteById(id);
     }
 
-    // Método para atualizar um cliente existente
     public Cliente atualizarCliente(Long id, Cliente clienteAtualizado) {
         if (clienteRepository.existsById(id)) {
-            clienteAtualizado.setId(id);  // Define o ID do cliente atualizado
-            clienteAtualizado.setDataAlteracao(java.time.LocalDateTime.now());  // Data e hora da alteração
-            return clienteRepository.save(clienteAtualizado);  // Salva o cliente atualizado no banco
+            Optional<Cliente> clienteExistente = clienteRepository.findById(id);
+            
+            if (clienteExistente.isPresent()) {
+                Cliente cliente = clienteExistente.get();
+                
+                if (clienteAtualizado.getSenha() != null && !clienteAtualizado.getSenha().isEmpty()) {
+                    cliente.setSenha(PasswordUtil.encrypt(clienteAtualizado.getSenha()));
+                }
+                
+                cliente.setNome(clienteAtualizado.getNome());
+                cliente.setEmail(clienteAtualizado.getEmail());
+                cliente.setGenero(clienteAtualizado.getGenero());
+                cliente.setDataNascimento(clienteAtualizado.getDataNascimento());
+                cliente.setCpf(clienteAtualizado.getCpf());
+                cliente.setTelefone(clienteAtualizado.getTelefone());
+                cliente.setDataAlteracao(java.time.LocalDateTime.now());
+                
+                if (clienteAtualizado.getEndereco() != null) {
+                    cliente.setEndereco(clienteAtualizado.getEndereco());
+                }
+                
+                if (clienteAtualizado.getCartao() != null) {
+                    cliente.setCartao(clienteAtualizado.getCartao());
+                }
+                
+                return clienteRepository.save(cliente);
+            }
         }
-        return null;  // Se o cliente não existir, retorna null
+        return null;
     }
 }

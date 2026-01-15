@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
 import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -17,28 +15,28 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "O nome não pode ser nulo.")
-    @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres.")
+    @NotNull
+    @Size(min = 2, max = 100)
     private String nome;
 
-    @NotNull(message = "O email não pode ser nulo.")
-    @Email(message = "O email deve ser válido.")
+    @NotNull
+    @Email
     private String email;
 
-    @NotNull(message = "O Gênero não pode ser nulo.")
+    @NotNull
     private String genero;
 
-    @NotNull(message = "A data de nascimento não pode ser nula.")
+    @NotNull
     private String dataNascimento;
 
-    @NotNull(message = "O CPF não pode ser nulo.")
+    @NotNull
     private String cpf;
 
-    @NotNull(message = "O número de telefone não pode ser nulo.")
+    @NotNull
     private String telefone;
 
-    @NotNull(message = "A senha não pode ser nula.")
-    @Size(min = 6, max = 100, message = "A senha deve ter entre 6 e 100 caracteres.")
+    @NotNull
+    @Size(min = 6, max = 100)
     private String senha;
 
     @Column(name = "data_cadastro")
@@ -47,7 +45,6 @@ public class Cliente {
     @Column(name = "data_alteracao")
     private LocalDateTime dataAlteracao;
 
-    // Relacionamentos
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("cliente")
     private Endereco endereco;
@@ -56,12 +53,9 @@ public class Cliente {
     @JsonIgnoreProperties("cliente")
     private Cartao cartao;
 
-
     public Cliente() {
         this.dataCadastro = LocalDateTime.now();
     }
-
-    // Getters e setters
 
     public Long getId() {
         return id;

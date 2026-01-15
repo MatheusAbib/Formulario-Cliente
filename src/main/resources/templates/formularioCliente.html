@@ -54,8 +54,7 @@
             <div class="corner-decoration bottom-left"></div>
             <div class="corner-decoration bottom-right"></div>
 
-            <!-- Formulário unificado para cadastro e edição -->
-      <form th:action="${cliente.id != null} ? @{/clientes/editar/{id}(id=${cliente.id})} : @{/clientes/add}"
+            <form th:action="${cliente.id != null} ? @{/clientes/editar/{id}(id=${cliente.id})} : @{/clientes/add}"
       method="post" 
       th:object="${cliente}"
       id="formCadastro">
@@ -115,16 +114,25 @@
                 <input type="password" id="senha" name="senha"
                        th:if="${cliente.id == null}"
                        required autocomplete="new-password" placeholder=" ">
+                <input type="password" id="senha" name="senha"
+                       th:unless="${cliente.id == null}"
+                       autocomplete="new-password" placeholder=" ">
                 <label class="floating-label" for="senha">
-                    <span th:text="${cliente.id == null} ? 'Senha*' : 'Nova Senha'"></span>
+                    <span th:text="${cliente.id == null} ? 'Senha*' : 'Nova Senha (opcional)'"></span>
                 </label>
                 <div class="error" id="senhaError"></div>
             </div>
 
-            <div class="form-group floating-label-group" th:if="${cliente.id == null}">
+            <div class="form-group floating-label-group">
                 <input type="password" id="confirmarSenha" name="confirmarSenha"
+                       th:if="${cliente.id == null}"
                        required placeholder=" ">
-                <label class="floating-label" for="confirmarSenha">Confirmar Senha*</label>
+                <input type="password" id="confirmarSenha" name="confirmarSenha"
+                       th:unless="${cliente.id == null}"
+                       placeholder=" ">
+                <label class="floating-label" for="confirmarSenha">
+                    <span th:text="${cliente.id == null} ? 'Confirmar Senha*' : 'Confirmar Nova Senha (opcional)'"></span>
+                </label>
                 <div class="error" id="confirmarSenhaError"></div>
             </div>
         </div>
@@ -163,7 +171,6 @@
                     <option value="SP">São Paulo</option>
                     <option value="RJ">Rio de Janeiro</option>
                     <option value="MG">Minas Gerais</option>
-                    <!-- adicione os demais estados -->
                 </select>
                 <label class="floating-label" for="estado">Estado</label>
             </div>
@@ -195,7 +202,6 @@
     </div>
 
     <!-- ==================== PAGAMENTO ==================== -->
-
 <div class="form-section">
     <div class="section-title">Pagamento</div>
     
@@ -204,14 +210,12 @@
             <input type="text" id="numeroCartao" th:field="*{cartao.numeroCartao}" required maxlength="19" placeholder=" ">
             <label class="floating-label" for="numeroCartao">Número do Cartão</label>
             <div class="error" id="numeroCartaoError"></div>
-
         </div>
 
         <div class="form-group floating-label-group">
             <input type="text" id="validade" th:field="*{cartao.validade}" required maxlength="7" placeholder=" ">
             <label class="floating-label" for="validade">Validade (MM/AAAA)</label>
             <div class="error" id="validadeError"></div>
-
         </div>
     </div>
 
@@ -240,17 +244,14 @@
     </div>
 </div>
 
-
     <button type="submit" th:text="${cliente.id != null} ? 'Salvar Alterações' : 'Salvar Cadastro'">Salvar Cadastro</button>
 </form>
 
         </div>
     </main>
 
-    <!-- Container para notificações toast -->
     <div id="toast-container"></div>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-links">
             <a href="#">Listagem</a>

@@ -21,7 +21,6 @@ function showToast(type, title, message) {
     
     container.appendChild(toast);
     
-    // Remove automaticamente após 5 segundos
     setTimeout(() => {
         if (toast.parentElement) {
             toast.classList.add('fade-out');
@@ -34,9 +33,7 @@ function showToast(type, title, message) {
     }, 5000);
 }
 
-// Mostra notificações quando a página carrega
 document.addEventListener('DOMContentLoaded', function() {
-    // Verifica se há flash attributes
     const toastType = document.body.getAttribute('data-toast-type');
     const toastTitle = document.body.getAttribute('data-toast-title');
     const toastMessage = document.body.getAttribute('data-toast-message');
@@ -45,18 +42,15 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast(toastType, toastTitle, toastMessage);
     }
     
-    // Remove os atributos após mostrar
     document.body.removeAttribute('data-toast-type');
     document.body.removeAttribute('data-toast-title');
     document.body.removeAttribute('data-toast-message');
-});
-
-// Validação em tempo real do formulário
-document.addEventListener('DOMContentLoaded', function() {
+    
     const form = document.getElementById('formCadastro');
     if (!form) return;
 
-    // Validação de CPF
+    const isEditMode = form.getAttribute('action').includes('/editar/');
+    
     const cpfInput = document.getElementById('cpf');
     if (cpfInput) {
         cpfInput.addEventListener('input', function(e) {
@@ -76,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validação de telefone
     const telefoneInput = document.getElementById('telefone');
     if (telefoneInput) {
         telefoneInput.addEventListener('input', function(e) {
@@ -98,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validação de CEP
     const cepInput = document.getElementById('cep');
     if (cepInput) {
         cepInput.addEventListener('input', function(e) {
@@ -114,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validação de número do cartão
     const numeroCartaoInput = document.getElementById('numeroCartao');
     if (numeroCartaoInput) {
         numeroCartaoInput.addEventListener('input', function(e) {
@@ -134,8 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validação de validade do cartão
-    // Validação de validade do cartão
     const validadeInput = document.getElementById('validade');
     const validadeError = document.getElementById('validadeError');
     
@@ -200,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
         validadeError.classList.remove('active');
     }
 
-    // Validação de senha
     const senhaInput = document.getElementById('senha');
     const confirmarSenhaInput = document.getElementById('confirmarSenha');
     
@@ -218,22 +206,41 @@ document.addEventListener('DOMContentLoaded', function() {
         const senhaError = document.getElementById('senhaError');
         const confirmarSenhaError = document.getElementById('confirmarSenhaError');
         
-        if (senhaInput.value.length < 6 && senhaInput.value.length > 0) {
-            senhaError.textContent = 'A senha deve ter pelo menos 6 caracteres';
-            senhaError.classList.add('active');
-        } else {
-            senhaError.classList.remove('active');
-        }
+        const senhaValue = senhaInput.value;
+        const confirmarSenhaValue = confirmarSenhaInput.value;
         
-        if (confirmarSenhaInput.value !== senhaInput.value && confirmarSenhaInput.value.length > 0) {
-            confirmarSenhaError.textContent = 'As senhas não coincidem';
-            confirmarSenhaError.classList.add('active');
+        if (!isEditMode) {
+            if (senhaValue.length < 6 && senhaValue.length > 0) {
+                senhaError.textContent = 'A senha deve ter pelo menos 6 caracteres';
+                senhaError.classList.add('active');
+            } else {
+                senhaError.classList.remove('active');
+            }
+            
+            if (confirmarSenhaValue !== senhaValue && confirmarSenhaValue.length > 0) {
+                confirmarSenhaError.textContent = 'As senhas não coincidem';
+                confirmarSenhaError.classList.add('active');
+            } else {
+                confirmarSenhaError.classList.remove('active');
+            }
         } else {
-            confirmarSenhaError.classList.remove('active');
+            if (senhaValue.length > 0 && senhaValue.length < 6) {
+                senhaError.textContent = 'A senha deve ter pelo menos 6 caracteres';
+                senhaError.classList.add('active');
+            } else {
+                senhaError.classList.remove('active');
+            }
+            
+            if (senhaValue.length > 0 && confirmarSenhaValue !== senhaValue) {
+                confirmarSenhaError.textContent = 'As senhas não coincidem';
+                confirmarSenhaError.classList.add('active');
+            } else {
+                confirmarSenhaError.classList.remove('active');
+            }
         }
     }
 
-       form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e) {
         let isValid = true;
         
         const requiredFields = form.querySelectorAll('[required]');
@@ -251,16 +258,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if (senhaInput && confirmarSenhaInput) {
-            if (senhaInput.value !== confirmarSenhaInput.value) {
-                isValid = false;
-                showToast('error', 'Erro!', 'As senhas não coincidem.');
-                confirmarSenhaInput.focus();
-            }
-            
-            if (senhaInput.value.length < 6) {
-                isValid = false;
-                showToast('error', 'Erro!', 'A senha deve ter pelo menos 6 caracteres.');
-                senhaInput.focus();
+            if (!isEditMode) {
+                if (senhaInput.value.length < 6) {
+                    isValid = false;
+                    showToast('error', 'Erro!', 'A senha deve ter pelo menos 6 caracteres.');
+                    senhaInput.focus();
+                }
+                
+                if (senhaInput.value !== confirmarSenhaInput.value) {
+                    isValid = false;
+                    showToast('error', 'Erro!', 'As senhas não coincidem.');
+                    confirmarSenhaInput.focus();
+                }
+            } else {
+                if (senhaInput.value.length > 0 || confirmarSenhaInput.value.length > 0) {
+                    if (senhaInput.value.length < 6) {
+                        isValid = false;
+                        showToast('error', 'Erro!', 'A senha deve ter pelo menos 6 caracteres.');
+                        senhaInput.focus();
+                    }
+                    
+                    if (senhaInput.value !== confirmarSenhaInput.value) {
+                        isValid = false;
+                        showToast('error', 'Erro!', 'As senhas não coincidem.');
+                        confirmarSenhaInput.focus();
+                    }
+                }
             }
         }
         
@@ -295,6 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        const dataNascimentoInput = document.getElementById('dataNascimento');
         if (dataNascimentoInput && dataNascimentoInput.value) {
             const dataNascimento = new Date(dataNascimentoInput.value);
             const dataAtual = new Date();
@@ -325,47 +349,76 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-});
-
-const style = document.createElement('style');
-style.textContent = `
-    .shake {
-        animation: shake 0.5s ease-in-out;
-    }
-    
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-`;
-document.head.appendChild(style);
-
 
     const dataNascimentoInput = document.getElementById('dataNascimento');
     
     if (dataNascimentoInput) {
-        dataNascimentoInput.addEventListener('change', validateDataNascimento);
-        dataNascimentoInput.addEventListener('blur', validateDataNascimento);
-        
         const hoje = new Date().toISOString().split('T')[0];
         dataNascimentoInput.setAttribute('max', hoje);
+        
+        dataNascimentoInput.addEventListener('change', function() {
+            const value = this.value;
+            
+            if (!value) return;
+            
+            const dataNascimento = new Date(value);
+            const dataAtual = new Date();
+            dataAtual.setHours(0, 0, 0, 0);
+            
+            if (dataNascimento > dataAtual) {
+                showToast('error', 'Data inválida', 'Data de nascimento não pode ser futura.');
+                this.value = '';
+                this.focus();
+            }
+        });
     }
 
-    function validateDataNascimento() {
-        if (!dataNascimentoInput) return;
-        
-        const value = dataNascimentoInput.value;
-        
-        if (!value) return;
-        
-        const dataNascimento = new Date(value);
-        const dataAtual = new Date();
-        dataAtual.setHours(0, 0, 0, 0);
-        
-        if (dataNascimento > dataAtual) {
-            showToast('error', 'Data inválida', 'Data de nascimento não pode ser futura.');
-            dataNascimentoInput.value = '';
-            dataNascimentoInput.focus();
+    const style = document.createElement('style');
+    style.textContent = `
+        .shake {
+            animation: shake 0.5s ease-in-out;
         }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .password-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .optional-field {
+            font-size: 0.8rem;
+            color: #999;
+            font-weight: normal;
+        }
+    `;
+    document.head.appendChild(style);
+
+    if (isEditMode && senhaInput && confirmarSenhaInput) {
+        const senhaLabel = document.querySelector('label[for="senha"]');
+        const confirmarSenhaLabel = document.querySelector('label[for="confirmarSenha"]');
+        
+        if (senhaLabel) {
+            const optionalSpan = document.createElement('span');
+            optionalSpan.className = 'optional-field';
+            senhaLabel.appendChild(optionalSpan);
+        }
+        
+        if (confirmarSenhaLabel) {
+            const optionalSpan = document.createElement('span');
+            optionalSpan.className = 'optional-field';
+            confirmarSenhaLabel.appendChild(optionalSpan);
+        }
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'password-info';
+        infoDiv.textContent = 'A senha atual será mantida se os campos ficarem em branco.';
+        confirmarSenhaInput.parentNode.insertBefore(infoDiv, confirmarSenhaInput.nextSibling);
     }
+});

@@ -11,12 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/Styles.css}">
 
 </head>
-<body th:attr="
-    data-toast-type=${toastType},
-    data-toast-title=${toastTitle},
-    data-toast-message=${toastMessage}
-">
-    <!-- Header -->
+<body>
     <header>
         <div class="logo">
             <div class="logo-text">CORREIOS<span>+</span></div>
@@ -26,17 +21,14 @@
         </div>
     </header>
 
-    <!-- Sidebar -->
     <aside>
         <ul class="sidebar-menu">
-
             <li><a href="/clientes/add"><i class="fas fa-user-plus"></i> Cadastre-se</a></li>
             <li><a href="#" class="active"><i class="fas fa-users"></i> Lista de Usuários</a></li>
             <li><a href="#"><i class="fas fa-cog"></i> Configurações</a></li>
         </ul>
     </aside>
 
-    <!-- Main Content -->
     <main>
         <div class="page-title">
             <h1>Lista de Clientes</h1>
@@ -50,59 +42,144 @@
             <div class="corner-decoration bottom-left"></div>
             <div class="corner-decoration bottom-right"></div>
 
-            <!-- Container com rolagem vertical -->
             <div class="table-scroll-container">
                 <table>
-                 <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>Telefone</th>
-        <th>Nascimento</th>
-        <th>Bandeira</th>
-        <th>CEP</th>
-        <th>Editado</th>
-        <th>Ações</th>
-    </tr>
-</thead>
-<tbody>
-    <tr th:if="${#lists.isEmpty(clientes)}">
-        <td colspan="6" style="text-align: center; padding: 20px; font-weight: bold;">
-            Nenhum cliente cadastrado no momento.
-        </td>
-    </tr>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Nascimento</th>
+                            <th>Bandeira</th>
+                            <th>CEP</th>
+                            <th>Editado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(clientes)}">
+                            <td colspan="8" class="empty-table">
+                                Nenhum cliente cadastrado no momento.
+                            </td>
+                        </tr>
 
-    <tr th:each="cliente : ${clientes}">
-        <td th:text="${cliente.id}"></td>
-        <td th:text="${cliente.nome}"></td>
-        <td th:text="${cliente.telefone}"></td>
-        <td th:text="${cliente.dataNascimento}"></td>
-        <td th:text="${cliente.cartao != null ? cliente.cartao.bandeira : ''}"></td>
-        <td th:text="${cliente.endereco != null ? cliente.endereco.cep : ''}"></td>
-
-        <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
-        <td>
-            <div class="action-buttons">
-                <a class="btn-action btn-edit" th:href="@{/clientes/editar/{id}(id=${cliente.id})}">
-                    <i class="fas fa-pencil-alt"></i>
-                </a>
-                <a class="btn-action btn-delete" th:attr="data-id=${cliente.id}" onclick="confirmarExclusao(this)">
-                    <i class="fas fa-trash"></i>
-                </a>
-                <a class="btn-action btn-view" style="cursor:pointer;" 
-                   th:attr="data-id=${cliente.id}" 
-                   onclick="abrirModalCliente(this)">
-                    <i class="fas fa-eye"></i>
-                </a>
-            </div>
-        </td>
-    </tr>
-</tbody>
-
+                        <tr th:each="cliente : ${clientes}">
+                            <td th:text="${cliente.id}"></td>
+                            <td th:text="${cliente.nome}"></td>
+                            <td th:text="${cliente.telefone}"></td>
+                            <td th:text="${cliente.dataNascimento}"></td>
+                            <td th:text="${cliente.cartao != null ? cliente.cartao.bandeira : ''}"></td>
+                            <td th:text="${cliente.endereco != null ? cliente.endereco.cep : ''}"></td>
+                            <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
+                            <td>
+                               <div class="action-buttons">
+                                    <a class="btn-action btn-edit" th:href="@{/clientes/editar/{id}(id=${cliente.id})}" title="Editar cliente">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                <a class="btn-action btn-delete" 
+                                th:attr="data-id=${cliente.id}, data-nome=${cliente.nome}" 
+                                title="Excluir cliente">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                                    <a class="btn-action btn-view" th:attr="data-id=${cliente.id}" title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
 
-            <!-- Botão para novo cliente -->
+            <!-- Paginação Simples -->
+
+<!-- Paginação Simples -->
+<div class="pagination-with-size" th:if="${totalItens > 0}">
+    <div th:if="${totalPaginas > 1}" class="pagination-container">
+        <div class="pagination-info">
+            Mostrando
+            <span th:text="${(paginaAtual * tamanhoPagina) + clientes.size()}">10</span> de 
+            <span th:text="${totalItens}">0</span> clientes
+        </div>
+        
+        <div class="pagination-controls">
+            <!-- Primeira página -->
+            <a th:if="${paginaAtual > 0}"
+               th:href="@{/clientes(pagina=0, tamanho=${tamanhoPagina})}"
+               class="pagination-btn">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+            <span th:unless="${paginaAtual > 0}" class="pagination-btn disabled">
+                <i class="fas fa-angle-double-left"></i>
+            </span>
+            
+            <!-- Página anterior -->
+            <a th:if="${paginaAtual > 0}"
+               th:href="@{/clientes(pagina=${paginaAtual - 1}, tamanho=${tamanhoPagina})}"
+               class="pagination-btn">
+                <i class="fas fa-angle-left"></i>
+            </a>
+            <span th:unless="${paginaAtual > 0}" class="pagination-btn disabled">
+                <i class="fas fa-angle-left"></i>
+            </span>
+            
+            <!-- Números de página -->
+            <div class="pagination-numbers">
+                <span th:each="pagina : ${#numbers.sequence(0, totalPaginas - 1)}">
+                    <a th:if="${pagina >= paginaAtual - 2 and pagina <= paginaAtual + 2 or totalPaginas <= 7}"
+                       th:href="@{/clientes(pagina=${pagina}, tamanho=${tamanhoPagina})}"
+                       th:class="'pagination-number' + (${paginaAtual == pagina} ? ' active' : '')"
+                       th:text="${pagina + 1}">
+                    </a>
+                    <span th:if="${pagina == paginaAtual - 3 and totalPaginas > 7}" class="pagination-ellipsis">...</span>
+                    <span th:if="${pagina == paginaAtual + 3 and totalPaginas > 7}" class="pagination-ellipsis">...</span>
+                </span>
+            </div>
+            
+            <!-- Próxima página -->
+            <a th:if="${paginaAtual < totalPaginas - 1}"
+               th:href="@{/clientes(pagina=${paginaAtual + 1}, tamanho=${tamanhoPagina})}"
+               class="pagination-btn">
+                <i class="fas fa-angle-right"></i>
+            </a>
+            <span th:unless="${paginaAtual < totalPaginas - 1}" class="pagination-btn disabled">
+                <i class="fas fa-angle-right"></i>
+            </span>
+            
+            <!-- Última página -->
+            <a th:if="${paginaAtual < totalPaginas - 1}"
+               th:href="@{/clientes(pagina=${totalPaginas - 1}, tamanho=${tamanhoPagina})}"
+               class="pagination-btn">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+            <span th:unless="${paginaAtual < totalPaginas - 1}" class="pagination-btn disabled">
+                <i class="fas fa-angle-double-right"></i>
+            </span>
+        </div>
+    </div>
+    <div class="pagination-size-wrapper">
+
+    <div class="pagination-size">
+        <div class="pagination-size-header">
+            <i class="fas fa-sliders-h"></i>
+            <span>Exibir</span>
+        </div>
+        
+        <div class="size-selector">
+            <select id="tamanhoPagina" th:attr="data-current=${tamanhoPagina}">
+                <option value="5">5 itens</option>
+                <option value="10">10 itens</option>
+                <option value="20">20 itens</option>
+                <option value="50">50 itens</option>
+            </select>
+        </div>
+
+    </div>
+    
+    </div>
+</div>
+
+
             <a class="btn-back" href="/clientes/add">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
@@ -112,8 +189,59 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer>
+ <div id="modalConfirmacao" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <div class="corner-decoration top-left"></div>
+            <div class="corner-decoration top-right"></div>
+            <div class="corner-decoration bottom-left"></div>
+            <div class="corner-decoration bottom-right"></div>
+            
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
+            </div>
+            
+            <div class="modal-content">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <p>Tem certeza que deseja excluir este cliente?</p>
+                <div class="cliente-info">
+                    <strong>Cliente:</strong> <span id="clienteNomeModal"></span><br>
+                    <strong>ID:</strong> <span id="clienteId"></span>
+                </div>
+                <p class="warning-text">
+                    <i class="fas fa-info-circle"></i> Esta ação não pode ser desfeita.
+                </p>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="cancelarExclusao" class="btn-cancelar">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button id="confirmarExclusao" class="btn-confirmar">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal de Detalhes -->
+    <div id="modalDetalhes" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-circle"></i> Detalhes do Cliente</h2>
+            </div>
+            <div class="modal-content" id="detalhesCliente">
+                <!-- Conteúdo será preenchido por JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button id="fecharDetalhes" class="btn-cancelar">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+        <footer>
         <div class="footer-links">
             <a href="#">Listagem</a>
             <a href="#">Política de Privacidade</a>
@@ -122,70 +250,6 @@
         </div>
         <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" target="_blank" style="color: #f0f0f0;">Matheus Abib</a>. Todos os direitos reservados.</div>
     </footer>
-    
-
-<!-- Modal de confirmação -->
-<div id="modalConfirmacao" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-        <div class="corner-decoration top-left"></div>
-        <div class="corner-decoration top-right"></div>
-        <div class="corner-decoration bottom-left"></div>
-        <div class="corner-decoration bottom-right"></div>
-        
-        <div class="modal-header">
-            <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h2>
-        </div>
-        
-        <div class="modal-content">
-            <div class="warning-icon">
-                <i class="fas fa-exclamation-circle"></i>
-            </div>
-            <p>Tem certeza que deseja excluir este cliente?</p>
-            <div class="cliente-info">
-                <strong>Cliente:</strong> <span id="clienteNome"></span><br>
-                <strong>ID:</strong> <span id="clienteId"></span>
-            </div>
-            <p style="color: #e74c3c; font-size: 0.9rem; margin-top: 10px;">
-                <i class="fas fa-info-circle"></i> Esta ação não pode ser desfeita.
-            </p>
-        </div>
-        
-        <div class="modal-actions">
-            <button onclick="cancelarExclusao()" class="btn-cancelar">
-                <i class="fas fa-times"></i> Cancelar
-            </button>
-            <button id="btnConfirmarExclusao" class="btn-confirmar">
-                <i class="fas fa-trash"></i> Excluir
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="modalCliente" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h2><i class="fas fa-user-circle"></i> Detalhes do Cliente</h2>
-        </div>
-        <div class="modal-content" id="conteudoCliente">
-            <!-- Conteúdo será preenchido via JavaScript -->
-        </div>
-        <div class="modal-actions">
-            <button onclick="fecharModalCliente()" class="btn-cancelar">Fechar</button>
-        </div>
-    </div>
-</div>
-
-
-<div id="toast-container"></div>
-
-<div id="modalConfirmacao" class="modal-overlay" style="display: none;">
-    <!-- ... conteúdo existente do modal ... -->
-</div>
-
-<div id="modalCliente" class="modal-overlay" style="display: none;">
-    <!-- ... conteúdo existente do modal ... -->
-</div>
-
     <script th:src="@{/js/script.js}"></script>
 
 </body>
