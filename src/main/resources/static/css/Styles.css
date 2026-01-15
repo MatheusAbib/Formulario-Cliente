@@ -684,6 +684,13 @@ footer {
     display: none;
 }
 
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .filters-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* Responsividade */
 @media (max-width: 1200px) {
     .table-scroll-container {
@@ -694,6 +701,39 @@ footer {
         min-width: 1200px;
     }
 }
+
+/* Para telas grandes */
+@media (min-width: 769px) {
+    .pagination-wrapper {
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .pagination-size {
+        margin-left: auto;
+        order: 2;
+    }
+    
+    .pagination-container {
+        order: 1;
+        flex: 1;
+    }
+
+      .pagination-with-size {
+        align-items: stretch;
+    }
+    
+    /* Quando tem paginação e size */
+    .pagination-with-size:has(.pagination-container:not(:empty)) .pagination-size-wrapper {
+        margin-left: auto;
+    }
+    
+    /* Quando só tem size */
+    .pagination-with-size:not(:has(.pagination-container:not(:empty))) .pagination-size {
+        margin-left: auto;
+    }
+}
+
 
 @media (max-width: 768px) {
     body {
@@ -784,6 +824,85 @@ footer {
 
     .form-group {
         min-width: 100%;
+    }
+
+     .filters-container {
+        padding: 20px;
+        margin-bottom: 20px;
+        max-width: 100%;
+    }
+    
+    .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .filters-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-filter {
+        width: 100%;
+        padding: 14px;
+    }
+    
+    .filters-header h3 {
+        font-size: 1.2rem;
+    }
+
+     .pagination-controls {
+        gap: 5px;
+    }
+
+    .pagination-numbers {
+        margin: 0 5px;
+    }
+.pagination-info{
+    font-size: 0.8rem;
+}
+    .pagination-number{
+            min-width: 20px;
+            height: 25px;
+            font-size: 0.6rem;
+    }
+    .pagination-btn{
+        width: 25px;
+        height: 25px;
+        font-size: 0.6rem;
+    }
+    .pagination-wrapper {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .pagination-container {
+        padding: 20px;
+        gap: 15px;
+        width: 100%;
+        min-height: 120px;
+    }
+    
+    .pagination-size {
+        width: 100%;
+        min-width: auto;
+    }
+    .pagination-size-header {
+        font-size: 0.85rem;
+    }
+
+    #tamanhoPagina {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+    }
+
+      .pagination-with-size {
+        flex-direction: column !important;
+        gap: 15px;
+    }
+    
+    .pagination-size-wrapper {
+        width: 100%;
     }
 }
 
@@ -1904,39 +2023,8 @@ footer {
     background-color: #fffdf0;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .filters-container {
-        padding: 20px;
-        margin-bottom: 20px;
-        max-width: 100%;
-    }
-    
-    .filters-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .filters-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .btn-filter {
-        width: 100%;
-        padding: 14px;
-    }
-    
-    .filters-header h3 {
-        font-size: 1.2rem;
-    }
-}
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    .filters-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+
 
 /* Animações */
 @keyframes fadeIn {
@@ -1983,100 +2071,6 @@ footer {
     border-right-color: var(--correios-blue);
 }
 
-
-
-
-
-/* Responsividade */
-@media (max-width: 768px) {
-
-    .pagination-controls {
-        gap: 5px;
-    }
-
-    .pagination-numbers {
-        margin: 0 5px;
-    }
-.pagination-info{
-    font-size: 0.8rem;
-}
-    .pagination-number{
-            min-width: 20px;
-            height: 25px;
-            font-size: 0.6rem;
-    }
-    .pagination-btn{
-        width: 25px;
-        height: 25px;
-        font-size: 0.6rem;
-    }
-    .pagination-wrapper {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .pagination-container {
-        padding: 20px;
-        gap: 15px;
-        width: 100%;
-        min-height: 120px;
-    }
-    
-    .pagination-size {
-        width: 100%;
-        min-width: auto;
-    }
-    .pagination-size-header {
-        font-size: 0.85rem;
-    }
-
-    #tamanhoPagina {
-            padding: 10px 15px;
-            font-size: 0.9rem;
-    }
-
-      .pagination-with-size {
-        flex-direction: column !important;
-        gap: 15px;
-    }
-    
-    .pagination-size-wrapper {
-        width: 100%;
-    }
-
-}
-
-/* Para telas grandes */
-@media (min-width: 769px) {
-    .pagination-wrapper {
-        justify-content: space-between;
-        align-items: flex-start;
-    }
-    
-    .pagination-size {
-        margin-left: auto;
-        order: 2;
-    }
-    
-    .pagination-container {
-        order: 1;
-        flex: 1;
-    }
-
-      .pagination-with-size {
-        align-items: stretch;
-    }
-    
-    /* Quando tem paginação e size */
-    .pagination-with-size:has(.pagination-container:not(:empty)) .pagination-size-wrapper {
-        margin-left: auto;
-    }
-    
-    /* Quando só tem size */
-    .pagination-with-size:not(:has(.pagination-container:not(:empty))) .pagination-size {
-        margin-left: auto;
-    }
-}
 
 /* Table Loader */
 .table-loader {
