@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 atualizarParametrosFormulario(params);
                 
                 const elapsedTime = Date.now() - loaderStartTime;
-                const remainingTime = Math.max(0, 1500 - elapsedTime);
+                const remainingTime = Math.max(0, 1000 - elapsedTime);
                 
                 setTimeout(() => {
                     reconfigurarEventListeners();
@@ -313,7 +313,7 @@ function excluirCliente(clienteId) {
         params.pagina = 0;
         
         const elapsedTime = Date.now() - loaderStartTime;
-        const remainingTime = Math.max(0, 1500 - elapsedTime);
+        const remainingTime = Math.max(0, 0 - elapsedTime);
         
         setTimeout(() => {
             carregarClientes(params);

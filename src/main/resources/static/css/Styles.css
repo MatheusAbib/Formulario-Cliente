@@ -1674,7 +1674,7 @@ footer {
 }
 
 .filters-container {
-    max-width: 100%;
+    max-width: 90%;
     margin: 0 auto;
     background-color: white;
     border-radius: var(--border-radius);

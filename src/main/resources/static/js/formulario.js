@@ -2,7 +2,6 @@ function mostrarLoaderCEP() {
     const cepInput = document.getElementById('cep');
     if (!cepInput) return;
     
-    // Remover loader existente se houver
     esconderLoaderCEP();
     
     atualizarEstadoCEP(true);
@@ -495,7 +494,6 @@ function buscarCep(cep) {
         return;
     }
     
-    // Prevenir múltiplas chamadas simultâneas
     if (window.buscandoCEP) return;
     window.buscandoCEP = true;
     
@@ -503,7 +501,6 @@ function buscarCep(cep) {
     
     const url = `https://viacep.com.br/ws/${cepLimpo}/json/`;
     
-    // Tempo mínimo de 1.5 segundos para mostrar o loader
     const startTime = Date.now();
     
     fetch(url)
@@ -583,11 +580,9 @@ function preencherEnderecoComCEP(data) {
     }
 }
 
-// Adicionar botão de busca manual
 const cepGroup = cepInput.parentNode;
 cepGroup.style.position = 'relative';
 
-// Verificar se o botão já existe
 if (!cepGroup.querySelector('.cep-search-btn')) {
     const buscarBtn = document.createElement('button');
     buscarBtn.type = 'button';
@@ -608,7 +603,6 @@ if (!cepGroup.querySelector('.cep-search-btn')) {
         z-index: 5;
     `;
     
-    // Estilo hover
     buscarBtn.addEventListener('mouseenter', function() {
         this.style.color = 'var(--correios-dark)';
     });
@@ -629,11 +623,9 @@ if (!cepGroup.querySelector('.cep-search-btn')) {
     
     cepGroup.appendChild(buscarBtn);
     
-    // Ajustar padding do input para não sobrepor o botão
     cepInput.style.paddingRight = '40px';
 }
 
-// Adicionar esta função para atualizar o visual durante a busca
 function atualizarEstadoCEP(buscando) {
     const cepInput = document.getElementById('cep');
     const buscarBtn = document.querySelector('.cep-search-btn');
