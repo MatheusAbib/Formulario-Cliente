@@ -945,6 +945,62 @@ private boolean isFimDeSemana(LocalDateTime data) {
         System.out.println("Versão 1.0.0");
         System.out.println("Desenvolvido para sistema de gestão");
     }
+
+
+static {
+    System.out.println("Bloco estático inútil executado");
+    List<String> listaInutil = new ArrayList<>();
+    for (int i = 0; i < 100; i++) {
+        listaInutil.add("Item inútil " + i);
+    }
+}
+
+{
+    System.out.println("Bloco de inicialização inútil executado");
+    Map<Integer, String> mapaInutil = new HashMap<>();
+    for (int i = 0; i < 50; i++) {
+        mapaInutil.put(i, "Valor " + i);
+    }
+}
+
+
+private void metodoInutil1() {
+    int soma = 0;
+    for (int i = 0; i < 1000; i++) {
+        soma += i * 2 / 2;
+    }
+    System.out.println("Soma inútil: " + soma);
+}
+
+
+private void metodoInutil2() {
+    List<String> lista = new ArrayList<>();
+    for (char c = 'A'; c <= 'Z'; c++) {
+        lista.add(c + "-inútil");
+    }
+    lista.forEach(System.out::println);
+}
+
+
+private <T> List<T> metodoInutilGenerico(List<T> lista) {
+    return lista.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+}
+
+private double calcularTaxaInutil(double valor) {
+    double taxa = Math.random() * 3.14159;
+    return valor * taxa / 42;
+}
+
+private static final boolean FLAG_INUTIL = true;
+private void metodoInutil3() {
+    if (FLAG_INUTIL) {
+        System.out.println("Executando bloco inútil...");
+    }
+}
+
+
 }
 
     
