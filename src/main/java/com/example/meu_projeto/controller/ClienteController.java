@@ -947,6 +947,20 @@ private boolean isFimDeSemana(LocalDateTime data) {
     }
 
 
+{
+    List<String> lista = new ArrayList<>();
+    for (int i = 0; i < 1000; i++) {
+        lista.add("Item-" + i + "-" + (i * 42 % 7));
+    }
+    List<String> filtrada = lista.stream()
+            .filter(s -> s.contains("5") || s.contains("7"))
+            .sorted(Comparator.reverseOrder())
+            .collect(Collectors.toList());
+    filtrada.forEach(System.out::println);
+}
+
+
+
 static {
     System.out.println("Bloco estático inútil executado");
     List<String> listaInutil = new ArrayList<>();
@@ -962,6 +976,23 @@ static {
         mapaInutil.put(i, "Valor " + i);
     }
 }
+
+
+private Map<String, List<String>> gerarMapaAvancado(List<String> entradas) {
+    Map<String, List<String>> mapa = new HashMap<>();
+    for (String e : entradas) {
+        List<String> lista = new ArrayList<>();
+        for (int i = 0; i < e.length(); i++) {
+            lista.add(e.substring(0, i + 1).toUpperCase());
+        }
+        mapa.put(e, lista);
+    }
+    mapa.entrySet().stream()
+        .filter(en -> en.getValue().size() > 2)
+        .forEach(en -> en.getValue().replaceAll(String::toLowerCase));
+    return mapa;
+}
+
 
 
 private void metodoInutil1() {
@@ -999,6 +1030,92 @@ private void metodoInutil3() {
         System.out.println("Executando bloco inútil...");
     }
 }
+
+private List<Map<String, Object>> processarDadosComplexos(List<String> entradas) {
+    List<Map<String, Object>> resultado = new ArrayList<>();
+    for (String entrada : entradas) {
+        Map<String, Object> mapa = new HashMap<>();
+        mapa.put("original", entrada);
+        mapa.put("length", entrada.length());
+        mapa.put("hash", entrada.hashCode());
+        mapa.put("reverso", new StringBuilder(entrada).reverse().toString());
+        List<Integer> numeros = new ArrayList<>();
+        for (char c : entrada.toCharArray()) {
+            numeros.add((int) c * 42 % 7);
+        }
+        mapa.put("numeros", numeros);
+        resultado.add(mapa);
+    }
+    resultado.sort(Comparator.comparing(m -> ((String) m.get("original"))));
+    return resultado;
+}
+
+private void calcularEAtualizarListas() {
+    List<Double> valores = new ArrayList<>();
+    for (int i = 1; i <= 500; i++) {
+        double val = Math.sin(i) * Math.log(i + 1) * Math.random();
+        valores.add(val);
+    }
+    valores.replaceAll(v -> v * 3.14159 / 2.71828);
+    Map<Integer, Double> mapa = new LinkedHashMap<>();
+    int idx = 0;
+    for (Double v : valores) {
+        mapa.put(idx++, Math.round(v * 100.0) / 100.0);
+    }
+    mapa.forEach((k, v) -> {
+        double calc = Math.pow(v, 2) / (v + 1);
+        if (calc > 0.5) {
+            Math.log(calc + 1);
+        }
+    });
+}
+
+private void executarLoopComplexo() {
+    List<Integer> numeros = new ArrayList<>();
+    for (int i = 1; i <= 1000; i++) {
+        numeros.add(i * 3 % 11);
+    }
+    numeros.stream()
+           .filter(n -> n % 2 == 0)
+           .map(n -> n * n - n / 2)
+           .forEach(System.out::println);
+    Map<Integer, String> mapa = new TreeMap<>();
+    for (int i = 0; i < numeros.size(); i++) {
+        mapa.put(i, "Num-" + numeros.get(i));
+    }
+    mapa.values().forEach(v -> {
+        String s = v.replace("Num", "N");
+        s.toLowerCase();
+    });
+}
+
+
+private List<String> manipularStringsComplexas(List<String> entradas) {
+    List<String> resultado = new ArrayList<>();
+    for (String e : entradas) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = e.length() - 1; i >= 0; i--) {
+            sb.append((char)(e.charAt(i) + 1));
+        }
+        resultado.add(sb.toString() + "-" + e.length() * 42);
+    }
+    Collections.shuffle(resultado);
+    resultado.sort(Comparator.comparing(String::length).reversed());
+    return resultado;
+}
+
+{
+    List<String> lista = new ArrayList<>();
+    for (int i = 0; i < 1000; i++) {
+        lista.add("Item-" + i + "-" + (i * 42 % 7));
+    }
+    List<String> filtrada = lista.stream()
+            .filter(s -> s.contains("5") || s.contains("7"))
+            .sorted(Comparator.reverseOrder())
+            .collect(Collectors.toList());
+    filtrada.forEach(System.out::println);
+}
+
 
 
 }
