@@ -138,115 +138,286 @@
         </div>
     </div>
 
-    <!-- ==================== ENDEREÇO ==================== -->
-    <div class="form-section">
-        <div class="section-title">Endereço</div>
+    <!-- ==================== ENDEREÇOS ==================== -->
+    <div class="form-section" id="enderecos-section">
+        <div class="section-header">
+            <div class="section-title">Endereços</div>
+            <button type="button" class="btn-add-endereco" onclick="adicionarEndereco()">
+                <i class="fas fa-plus"></i> Adicionar Endereço
+            </button>
+        </div>
         
-        <div class="form-row">
-            <div class="form-group floating-label-group">
-                <input type="text" id="cep" th:field="*{endereco.cep}" required maxlength="9" placeholder=" ">
-                <label class="floating-label" for="cep">CEP</label>
-                <div class="error" id="cepError"></div>
-            </div>
-            <div class="form-group floating-label-group">
-                <input type="text" id="bairro" th:field="*{endereco.bairro}" required placeholder=" ">
-                <label class="floating-label" for="bairro">Bairro</label>
-            </div>
-            <div class="form-group floating-label-group">
-                <input type="text" id="enderecoEntrega" th:field="*{endereco.enderecoEntrega}" required placeholder=" ">
-                <label class="floating-label" for="enderecoEntrega">Endereço de Entrega</label>
-            </div>
+        <div class="enderecos-container" id="enderecos-container">
+            <!-- Template para novo endereço (escondido) -->
+            <template id="endereco-template">
+                <div class="endereco-item">
+                    <div class="endereco-header">
+                        <h3 class="endereco-title">Endereço <span class="endereco-numero">1</span></h3>
+                        <button type="button" class="btn-remove-endereco" onclick="mostrarModalExclusaoEndereco(this)">
+                            <i class="fas fa-trash"></i> Remover
+                        </button>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="cep" name="enderecos[0].cep" required maxlength="9" placeholder=" ">
+                            <label class="floating-label">CEP</label>
+                            <div class="error cep-error"></div>
+                        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="bairro" name="enderecos[0].bairro" required placeholder=" ">
+                            <label class="floating-label">Bairro</label>
+                        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="enderecoEntrega" name="enderecos[0].enderecoEntrega" required placeholder=" ">
+                            <label class="floating-label">Endereço de Entrega</label>
+                        </div>
+                    </div>
 
+                    <div class="form-row">
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="cidade" name="enderecos[0].cidade" required placeholder=" ">
+                            <label class="floating-label">Cidade</label>
+                        </div>
 
-        </div>
+                        <div class="form-group floating-label-group custom-select-container">
+                            <select class="estado" name="enderecos[0].estado" required>
+                                <option value="" disabled selected></option>
+                                <option value="SP">São Paulo</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="ES">Espírito Santo</option>
+                                <option value="PR">Paraná</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="MS">Mato Grosso do Sul</option>
+                                <option value="MT">Mato Grosso</option>
+                                <option value="GO">Goiás</option>
+                                <option value="DF">Distrito Federal</option>
+                                <option value="BA">Bahia</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="PB">Paraíba</option>
+                                <option value="RN">Rio Grande do Norte</option>
+                                <option value="CE">Ceará</option>
+                                <option value="PI">Piauí</option>
+                                <option value="MA">Maranhão</option>
+                                <option value="PA">Pará</option>
+                                <option value="AP">Amapá</option>
+                                <option value="AM">Amazonas</option>
+                                <option value="RR">Roraima</option>
+                                <option value="AC">Acre</option>
+                                <option value="RO">Rondônia</option>
+                                <option value="TO">Tocantins</option>
+                            </select>
+                            <label class="floating-label">Estado</label>
+                        </div>
 
-        <div class="form-row">
-            <div class="form-group floating-label-group">
-                <input type="text" id="cidade" th:field="*{endereco.cidade}" required placeholder=" ">
-                <label class="floating-label" for="cidade">Cidade</label>
-            </div>
+                        <div class="form-group floating-label-group custom-select-container">
+                            <select class="pais" name="enderecos[0].pais" required>
+                                <option value="" disabled selected></option>
+                                <option value="Brasil">Brasil</option>
+                            </select>
+                            <label class="floating-label">País</label>
+                        </div>
+                    </div>
 
-            <div class="form-group floating-label-group custom-select-container">
-                <select id="estado" th:field="*{endereco.estado}" required>
-                    <option value="" disabled selected></option>
-                    <option value="SP">São Paulo</option>
-                    <option value="RJ">Rio de Janeiro</option>
-                    <option value="MG">Minas Gerais</option>
-                </select>
-                <label class="floating-label" for="estado">Estado</label>
-            </div>
+                    <div class="form-row">
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="tipoResidencia" name="enderecos[0].tipoResidencia" required placeholder=" ">
+                            <label class="floating-label">Tipo de Residência</label>
+                        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="numero" name="enderecos[0].numero" required placeholder=" ">
+                            <label class="floating-label">Número</label>
+                        </div>
 
-            <div class="form-group floating-label-group custom-select-container">
-                <select id="pais" th:field="*{endereco.pais}" required>
-                    <option value="" disabled selected></option>
-                    <option value="Brasil">Brasil</option>
-                </select>
-                <label class="floating-label" for="pais">País</label>
-            </div>
-        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="descricaoEndereco" name="enderecos[0].descricaoEndereco" required placeholder=" ">
+                            <label class="floating-label">Descrição do Endereço</label>
+                        </div>
+                    </div>
+                </div>
+            </template>
 
-        <div class="form-row">
-            <div class="form-group floating-label-group">
-                <input type="text" id="tipoResidencia" th:field="*{endereco.tipoResidencia}" required placeholder=" ">
-                <label class="floating-label" for="tipoResidencia">Tipo de Residência</label>
-            </div>
-            <div class="form-group floating-label-group">
-                <input type="text" id="numero" th:field="*{endereco.numero}" required placeholder=" ">
-                <label class="floating-label" for="numero">Número</label>
-            </div>
+            <!-- Endereços existentes serão renderizados aqui pelo Thymeleaf -->
+            <div th:each="endereco, stat : ${cliente.enderecos}" th:if="${cliente.enderecos} and ${cliente.enderecos.size()} > 0">
+                <div class="endereco-item">
+                    <div class="endereco-header">
+                        <h3 class="endereco-title">Endereço <span class="endereco-numero" th:text="${stat.index + 1}">1</span></h3>
+                        <button type="button" class="btn-remove-endereco" onclick="removerEndereco(this)">
+                            <i class="fas fa-trash"></i> Remover
+                        </button>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="cep" th:field="*{enderecos[__${stat.index}__].cep}" th:id="'cep_' + ${stat.index}" required maxlength="9" placeholder=" ">
+                            <label class="floating-label">CEP</label>
+                            <div class="error cep-error" th:id="'cepError_' + ${stat.index}"></div>
+                        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="bairro" th:field="*{enderecos[__${stat.index}__].bairro}" required placeholder=" ">
+                            <label class="floating-label">Bairro</label>
+                        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="enderecoEntrega" th:field="*{enderecos[__${stat.index}__].enderecoEntrega}" required placeholder=" ">
+                            <label class="floating-label">Endereço de Entrega</label>
+                        </div>
+                    </div>
 
-            <div class="form-group floating-label-group">
-                <input type="text" id="descricaoEndereco" th:field="*{endereco.descricaoEndereco}" required placeholder=" ">
-                <label class="floating-label" for="descricaoEndereco">Descrição do Endereço</label>
+                    <div class="form-row">
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="cidade" th:field="*{enderecos[__${stat.index}__].cidade}" required placeholder=" ">
+                            <label class="floating-label">Cidade</label>
+                        </div>
+
+                        <div class="form-group floating-label-group custom-select-container">
+                            <select class="estado" th:field="*{enderecos[__${stat.index}__].estado}" required>
+                                <option value="" disabled selected></option>
+                                <option value="SP">São Paulo</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="ES">Espírito Santo</option>
+                                <option value="PR">Paraná</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="MS">Mato Grosso do Sul</option>
+                                <option value="MT">Mato Grosso</option>
+                                <option value="GO">Goiás</option>
+                                <option value="DF">Distrito Federal</option>
+                                <option value="BA">Bahia</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="PB">Paraíba</option>
+                                <option value="RN">Rio Grande do Norte</option>
+                                <option value="CE">Ceará</option>
+                                <option value="PI">Piauí</option>
+                                <option value="MA">Maranhão</option>
+                                <option value="PA">Pará</option>
+                                <option value="AP">Amapá</option>
+                                <option value="AM">Amazonas</option>
+                                <option value="RR">Roraima</option>
+                                <option value="AC">Acre</option>
+                                <option value="RO">Rondônia</option>
+                                <option value="TO">Tocantins</option>
+                            </select>
+                            <label class="floating-label">Estado</label>
+                        </div>
+
+                        <div class="form-group floating-label-group custom-select-container">
+                            <select class="pais" th:field="*{enderecos[__${stat.index}__].pais}" required>
+                                <option value="" disabled selected></option>
+                                <option value="Brasil">Brasil</option>
+                            </select>
+                            <label class="floating-label">País</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="tipoResidencia" th:field="*{enderecos[__${stat.index}__].tipoResidencia}" required placeholder=" ">
+                            <label class="floating-label">Tipo de Residência</label>
+                        </div>
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="numero" th:field="*{enderecos[__${stat.index}__].numero}" required placeholder=" ">
+                            <label class="floating-label">Número</label>
+                        </div>
+
+                        <div class="form-group floating-label-group">
+                            <input type="text" class="descricaoEndereco" th:field="*{enderecos[__${stat.index}__].descricaoEndereco}" required placeholder=" ">
+                            <label class="floating-label">Descrição do Endereço</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- ==================== PAGAMENTO ==================== -->
-<div class="form-section">
-    <div class="section-title">Pagamento</div>
-    
-    <div class="form-row">
-        <div class="form-group floating-label-group">
-            <input type="text" id="numeroCartao" th:field="*{cartao.numeroCartao}" required maxlength="19" placeholder=" ">
-            <label class="floating-label" for="numeroCartao">Número do Cartão</label>
-            <div class="error" id="numeroCartaoError"></div>
+    <div class="form-section">
+        <div class="section-title">Pagamento</div>
+        
+        <div class="form-row">
+            <div class="form-group floating-label-group">
+                <input type="text" id="numeroCartao" th:field="*{cartao.numeroCartao}" required maxlength="19" placeholder=" ">
+                <label class="floating-label" for="numeroCartao">Número do Cartão</label>
+                <div class="error" id="numeroCartaoError"></div>
+            </div>
+
+            <div class="form-group floating-label-group">
+                <input type="text" id="validade" th:field="*{cartao.validade}" required maxlength="7" placeholder=" ">
+                <label class="floating-label" for="validade">Validade (MM/AAAA)</label>
+                <div class="error" id="validadeError"></div>
+            </div>
         </div>
 
-        <div class="form-group floating-label-group">
-            <input type="text" id="validade" th:field="*{cartao.validade}" required maxlength="7" placeholder=" ">
-            <label class="floating-label" for="validade">Validade (MM/AAAA)</label>
-            <div class="error" id="validadeError"></div>
+        <div class="form-row">
+            <div class="form-group floating-label-group custom-select-container">
+                <select id="bandeira" th:field="*{cartao.bandeira}" required>
+                    <option value="" disabled selected></option>
+                    <option value="Visa">Visa</option>
+                    <option value="Mastercard">Mastercard</option>
+                    <option value="Elo">Elo</option>
+                    <option value="Hipercard">Hipercard</option>
+                    <option value="American Express">American Express</option>
+                </select>
+                <label class="floating-label" for="bandeira">Bandeira</label>
+            </div>
+
+            <div class="form-group floating-label-group cvv-field">
+                <input type="text" id="codigoSeguranca" th:field="*{cartao.codigoSeguranca}" required maxlength="3" placeholder=" ">
+                <label class="floating-label" for="codigoSeguranca">CVV</label>
+            </div>
+
+            <div class="form-group floating-label-group">
+                <input type="text" id="nomeCartao" th:field="*{cartao.nomeCartao}" required placeholder=" ">
+                <label class="floating-label" for="nomeCartao">Nome no Cartão</label>
+            </div>
         </div>
     </div>
-
-    <div class="form-row">
-        <div class="form-group floating-label-group custom-select-container">
-            <select id="bandeira" th:field="*{cartao.bandeira}" required>
-                <option value="" disabled selected></option>
-                <option value="Visa">Visa</option>
-                <option value="Mastercard">Mastercard</option>
-                <option value="Elo">Elo</option>
-                <option value="Hipercard">Hipercard</option>
-                <option value="American Express">American Express</option>
-            </select>
-            <label class="floating-label" for="bandeira">Bandeira</label>
-        </div>
-
-        <div class="form-group floating-label-group cvv-field">
-            <input type="text" id="codigoSeguranca" th:field="*{cartao.codigoSeguranca}" required maxlength="3" placeholder=" ">
-            <label class="floating-label" for="codigoSeguranca">CVV</label>
-        </div>
-
-        <div class="form-group floating-label-group">
-            <input type="text" id="nomeCartao" th:field="*{cartao.nomeCartao}" required placeholder=" ">
-            <label class="floating-label" for="nomeCartao">Nome no Cartão</label>
-        </div>
-    </div>
-</div>
 
     <button type="submit" th:text="${cliente.id != null} ? 'Salvar Alterações' : 'Salvar Cadastro'">Salvar Cadastro</button>
 </form>
+
+<!-- Modal de Confirmação para Excluir Endereço -->
+<div id="modalConfirmacao" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+        <div class="corner-decoration top-left"></div>
+        <div class="corner-decoration top-right"></div>
+        <div class="corner-decoration bottom-left"></div>
+        <div class="corner-decoration bottom-right"></div>
+        
+        <div class="modal-header">
+            <h2><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão de Endereço</h2>
+        </div>
+        
+        <div class="modal-content">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <p>Tem certeza que deseja excluir este endereço?</p>
+            <div class="cliente-info">
+                <strong>Endereço:</strong> <span id="enderecoInfoModal"></span><br>
+                <strong>Número:</strong> <span id="enderecoNumeroModal"></span>
+            </div>
+            <p class="warning-text">
+                <i class="fas fa-info-circle"></i> Esta ação não pode ser desfeita.
+            </p>
+        </div>
+        
+        <div class="modal-actions">
+            <button id="cancelarExclusaoEndereco" class="btn-cancelar">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button id="confirmarExclusaoEndereco" class="btn-confirmar">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
+        </div>
+    </div>
+</div>
 
         </div>
     </main>

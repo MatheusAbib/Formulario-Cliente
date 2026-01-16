@@ -1,7 +1,6 @@
 package com.example.meu_projeto.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -16,16 +15,13 @@ public class Cartao {
     private String bandeira;
     private String codigoSeguranca;
     private String nomeCartao;
-    private String validade; 
-
+    private String validade;
 
     @OneToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     @JsonIgnoreProperties("cartao")
     private Cliente cliente;
 
-
-    // Getters e setters
     public Long getId() {
         return id;
     }
@@ -75,11 +71,10 @@ public class Cartao {
     }
 
     public String getValidade() {
-    return validade;
+        return validade;
     }
 
     public void setValidade(String validade) {
         this.validade = validade;
     }
-
 }

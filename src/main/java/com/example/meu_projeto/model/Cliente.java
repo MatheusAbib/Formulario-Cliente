@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -45,9 +47,9 @@ public class Cliente {
     @Column(name = "data_alteracao")
     private LocalDateTime dataAlteracao;
 
-    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("cliente")
-    private Endereco endereco;
+    private List<Endereco> enderecos = new ArrayList<>();
 
     @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("cliente")
@@ -137,15 +139,27 @@ public class Cliente {
         this.dataAlteracao = dataAlteracao;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public List<Endereco> getEnderecos() {
+        return enderecos;
     }
 
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
-        if (endereco != null) {
-            endereco.setCliente(this);
+    public void setEnderecos(List<Endereco> enderecos) {
+        this.enderecos = enderecos;
+        if (enderecos != null) {
+            for (Endereco endereco : enderecos) {
+                endereco.setCliente(this);
+            }
         }
+    }
+
+    public void addEndereco(Endereco endereco) {
+        enderecos.add(endereco);
+        endereco.setCliente(this);
+    }
+
+    public void removeEndereco(Endereco endereco) {
+        enderecos.remove(endereco);
+        endereco.setCliente(null);
     }
 
     public Cartao getCartao() {

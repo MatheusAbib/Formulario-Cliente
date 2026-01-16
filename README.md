@@ -1,7 +1,5 @@
 # 📦 Sistema de Gerenciamento de Clientes - Correios+
 
-![Demonstração do Projeto](/Crud.gif)
-
 ---
 
 ## 🌟 Visão Geral

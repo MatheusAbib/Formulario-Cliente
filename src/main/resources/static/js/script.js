@@ -166,167 +166,221 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-  function reconfigurarEventListeners() {
-    const linksPaginacao = document.querySelectorAll('.pagination-btn:not(.disabled), .pagination-number:not(.active)');
-    linksPaginacao.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const url = new URL(this.href);
+    function reconfigurarEventListeners() {
+        const linksPaginacao = document.querySelectorAll('.pagination-btn:not(.disabled), .pagination-number:not(.active)');
+        linksPaginacao.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const url = new URL(this.href);
+                const params = {};
+                
+                url.searchParams.forEach((value, key) => {
+                    params[key] = value;
+                });
+                
+                carregarClientes(params);
+            });
+        });
+        
+        const botoesDelete = document.querySelectorAll('.btn-action.btn-delete');
+        botoesDelete.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const clienteIdAtual = this.getAttribute('data-id');
+                const clienteNome = this.getAttribute('data-nome');
+                
+                const spanNome = document.getElementById('clienteNomeModal');
+                const spanId = document.getElementById('clienteId');
+                
+                if (spanNome && spanId) {
+                    spanNome.textContent = clienteNome;
+                    spanId.textContent = clienteIdAtual;
+                }
+                
+                if (modalConfirmacao) {
+                    modalConfirmacao.style.display = 'flex';
+                    
+                    const btnConfirmar = document.getElementById('confirmarExclusao');
+                    const btnCancelar = document.getElementById('cancelarExclusao');
+                    
+                    if (btnConfirmar) {
+                        btnConfirmar.onclick = function() {
+                            excluirCliente(clienteIdAtual);
+                        };
+                    }
+                    
+                    if (btnCancelar) {
+                        btnCancelar.onclick = function() {
+                            modalConfirmacao.style.display = 'none';
+                        };
+                    }
+                }
+            });
+        });
+        
+        const botoesView = document.querySelectorAll('.btn-action.btn-view');
+        botoesView.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const clienteId = this.getAttribute('data-id');
+                
+                fetch(`/clientes/detalhes/${clienteId}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error();
+                        return response.json();
+                    })
+                    .then(cliente => {
+                        // Construir HTML para múltiplos endereços
+                        let enderecosHtml = '';
+                        
+                        if (cliente.enderecos && cliente.enderecos.length > 0) {
+                            cliente.enderecos.forEach((endereco, index) => {
+                                enderecosHtml += `
+                                    <div class="info-section">
+                                        <h4 class="section-title">
+                                            <i class="fas fa-map-marker-alt"></i> Endereço ${index + 1}
+                                        </h4>
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <div class="info-label">Tipo de Residência</div>
+                                                <div class="info-value">${endereco.tipoResidencia || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">Número</div>
+                                                <div class="info-value">${endereco.numero || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">Endereço</div>
+                                                <div class="info-value">${endereco.enderecoEntrega || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">Bairro</div>
+                                                <div class="info-value">${endereco.bairro || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">CEP</div>
+                                                <div class="info-value">${endereco.cep || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">Cidade</div>
+                                                <div class="info-value">${endereco.cidade || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">Estado</div>
+                                                <div class="info-value">${endereco.estado || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">País</div>
+                                                <div class="info-value">${endereco.pais || 'Não informado'}</div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-label">Descrição</div>
+                                                <div class="info-value">${endereco.descricaoEndereco || 'Não informado'}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            enderecosHtml = `
+                                <div class="info-section">
+                                    <div class="section-title">
+                                        <i class="fas fa-map-marker-alt"></i> Endereços
+                                    </div>
+                                    <div class="info-value">Nenhum endereço cadastrado</div>
+                                </div>
+                            `;
+                        }
+
+                        document.getElementById('detalhesCliente').innerHTML = `
+                            <div class="info-section">
+                                <div class="section-title">
+                                    <i class="fas fa-user"></i> Informações Pessoais
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item"><div class="info-label">Nome completo</div><div class="info-value">${cliente.nome || 'Não informado'}</div></div>
+                                    <div class="info-item"><div class="info-label">E-mail</div><div class="info-value">${cliente.email || 'Não informado'}</div></div>
+                                    <div class="info-item"><div class="info-label">Telefone</div><div class="info-value">${cliente.telefone || 'Não informado'}</div></div>
+                                    <div class="info-item"><div class="info-label">CPF</div><div class="info-value">${cliente.cpf || 'Não informado'}</div></div>
+                                    <div class="info-item"><div class="info-label">Gênero</div><div class="info-value">${cliente.genero || 'Não informado'}</div></div>
+                                    <div class="info-item"><div class="info-label">Data de Nascimento</div><div class="info-value">${cliente.dataNascimento || 'Não informado'}</div></div>
+                                </div>
+                            </div>
+
+                            ${enderecosHtml}
+
+                            <div class="info-section">
+                                <div class="section-title">
+                                    <i class="fas fa-credit-card"></i> Informações de Pagamento
+                                </div>
+                                ${
+                                    cliente.cartao
+                                        ? `
+                                            <div class="info-grid">
+                                                <div class="info-item"><div class="info-label">Bandeira</div><div class="info-value">${cliente.cartao.bandeira || 'Não informado'}</div></div>
+                                                <div class="info-item"><div class="info-label">Número</div><div class="info-value">${cliente.cartao.numeroCartao || 'Não informado'}</div></div>
+                                                <div class="info-item"><div class="info-label">Nome no Cartão</div><div class="info-value">${cliente.cartao.nomeCartao || 'Não informado'}</div></div>
+                                                <div class="info-item"><div class="info-label">Validade</div><div class="info-value">${cliente.cartao.validade || 'Não informado'}</div></div>
+                                                <div class="info-item"><div class="info-label">CVV</div><div class="info-value">${cliente.cartao.codigoSeguranca || 'Não informado'}</div></div>
+                                            </div>
+                                        `
+                                        : `<div class="info-value">Não informado</div>`
+                                }
+                            </div>
+                        `;
+
+                        if (modalDetalhes) {
+                            modalDetalhes.style.display = 'flex';
+                        }
+                    })
+                    .catch(() => alert('Erro ao carregar detalhes do cliente'));
+            });
+        });
+    }
+
+    function excluirCliente(clienteId) {
+        modalConfirmacao.style.display = 'none';
+        
+        loaderStartTime = Date.now();
+        
+        if (tableLoader) {
+            tableLoader.style.display = 'flex';
+        }
+        
+        fetch(`/clientes/excluir/${clienteId}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro na exclusão');
+            return response.text();
+        })
+        .then(html => {
+            const url = new URL(window.location.href);
             const params = {};
             
             url.searchParams.forEach((value, key) => {
                 params[key] = value;
             });
             
-            carregarClientes(params);
-        });
-    });
-    
-    const botoesDelete = document.querySelectorAll('.btn-action.btn-delete');
-    botoesDelete.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const clienteIdAtual = this.getAttribute('data-id');
-            const clienteNome = this.getAttribute('data-nome');
+            params.pagina = 0;
             
-            const spanNome = document.getElementById('clienteNomeModal');
-            const spanId = document.getElementById('clienteId');
+            const elapsedTime = Date.now() - loaderStartTime;
+            const remainingTime = Math.max(0, 0 - elapsedTime);
             
-            if (spanNome && spanId) {
-                spanNome.textContent = clienteNome;
-                spanId.textContent = clienteIdAtual;
+            setTimeout(() => {
+                carregarClientes(params);
+            }, remainingTime);
+        })
+        .catch(error => {
+            console.error('Erro ao excluir cliente:', error);
+            if (tableLoader) {
+                tableLoader.style.display = 'none';
             }
-            
-            if (modalConfirmacao) {
-                modalConfirmacao.style.display = 'flex';
-                
-                const btnConfirmar = document.getElementById('confirmarExclusao');
-                const btnCancelar = document.getElementById('cancelarExclusao');
-                
-                if (btnConfirmar) {
-                    btnConfirmar.onclick = function() {
-                        excluirCliente(clienteIdAtual);
-                    };
-                }
-                
-                if (btnCancelar) {
-                    btnCancelar.onclick = function() {
-                        modalConfirmacao.style.display = 'none';
-                    };
-                }
-            }
+            alert('Erro ao excluir cliente. Tente novamente.');
         });
-    });
-    
-    const botoesView = document.querySelectorAll('.btn-action.btn-view');
-    botoesView.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const clienteId = this.getAttribute('data-id');
-            
-            fetch(`/clientes/detalhes/${clienteId}`)
-                .then(response => {
-                    if (!response.ok) throw new Error();
-                    return response.json();
-                })
-                .then(cliente => {
-                    const enderecoCompleto = cliente.endereco
-                        ? `${cliente.endereco.tipoResidencia}, ${cliente.endereco.numero}, ${cliente.endereco.bairro}, ${cliente.endereco.cidade} - ${cliente.endereco.estado}, ${cliente.endereco.cep}`
-                        : 'Não informado';
-
-                    document.getElementById('detalhesCliente').innerHTML = `
-                        <div class="info-section">
-                            <div class="section-title">
-                                <i class="fas fa-user"></i> Informações Pessoais
-                            </div>
-                            <div class="info-grid">
-                                <div class="info-item"><div class="info-label">Nome completo</div><div class="info-value">${cliente.nome}</div></div>
-                                <div class="info-item"><div class="info-label">E-mail</div><div class="info-value">${cliente.email}</div></div>
-                                <div class="info-item"><div class="info-label">Telefone</div><div class="info-value">${cliente.telefone}</div></div>
-                                <div class="info-item"><div class="info-label">CPF</div><div class="info-value">${cliente.cpf}</div></div>
-                                <div class="info-item"><div class="info-label">Gênero</div><div class="info-value">${cliente.genero}</div></div>
-                                <div class="info-item"><div class="info-label">Data de Nascimento</div><div class="info-value">${cliente.dataNascimento}</div></div>
-                            </div>
-                        </div>
-
-                        <div class="info-section">
-                            <div class="section-title">
-                                <i class="fas fa-map-marker-alt"></i> Endereço
-                            </div>
-                            <div class="info-value">${enderecoCompleto}</div>
-                        </div>
-
-                        <div class="info-section">
-                            <div class="section-title">
-                                <i class="fas fa-credit-card"></i> Informações de Pagamento
-                            </div>
-                            ${
-                                cliente.cartao
-                                    ? `
-                                        <div class="info-grid">
-                                            <div class="info-item"><div class="info-label">Bandeira</div><div class="info-value">${cliente.cartao.bandeira}</div></div>
-                                            <div class="info-item"><div class="info-label">Número</div><div class="info-value">${cliente.cartao.numeroCartao}</div></div>
-                                            <div class="info-item"><div class="info-label">Nome no Cartão</div><div class="info-value">${cliente.cartao.nomeCartao}</div></div>
-                                            <div class="info-item"><div class="info-label">Validade</div><div class="info-value">${cliente.cartao.validade || 'Não informado'}</div></div>
-                                        </div>
-                                    `
-                                    : `<div class="info-value">Não informado</div>`
-                            }
-                        </div>
-                    `;
-
-                    if (modalDetalhes) {
-                        modalDetalhes.style.display = 'flex';
-                    }
-                })
-                .catch(() => alert('Erro ao carregar detalhes do cliente'));
-        });
-    });
-}
-
-function excluirCliente(clienteId) {
-    modalConfirmacao.style.display = 'none';
-    
-    loaderStartTime = Date.now();
-    
-    if (tableLoader) {
-        tableLoader.style.display = 'flex';
     }
-    
-    fetch(`/clientes/excluir/${clienteId}`, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Erro na exclusão');
-        return response.text();
-    })
-    .then(html => {
-        const url = new URL(window.location.href);
-        const params = {};
-        
-        url.searchParams.forEach((value, key) => {
-            params[key] = value;
-        });
-        
-        params.pagina = 0;
-        
-        const elapsedTime = Date.now() - loaderStartTime;
-        const remainingTime = Math.max(0, 0 - elapsedTime);
-        
-        setTimeout(() => {
-            carregarClientes(params);
-        }, remainingTime);
-    })
-    .catch(error => {
-        console.error('Erro ao excluir cliente:', error);
-        if (tableLoader) {
-            tableLoader.style.display = 'none';
-        }
-        alert('Erro ao excluir cliente. Tente novamente.');
-    });
-}
 
     setupModalConfirmacao();
     setupModalDetalhes();

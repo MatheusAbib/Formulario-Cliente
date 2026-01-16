@@ -1,7 +1,6 @@
 package com.example.meu_projeto.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -19,17 +18,14 @@ public class Endereco {
     private String cidade;
     private String estado;
     private String pais;
-
     private String enderecoEntrega;
     private String descricaoEndereco;
 
-@OneToOne
-@JoinColumn(name = "cliente_id", nullable = false)
-@JsonIgnoreProperties("endereco")
-private Cliente cliente;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
+    @JsonIgnoreProperties("enderecos")
+    private Cliente cliente;
 
-
-    // Getters e setters
     public Long getId() {
         return id;
     }
@@ -45,7 +41,6 @@ private Cliente cliente;
     public void setTipoResidencia(String tipoResidencia) {
         this.tipoResidencia = tipoResidencia;
     }
-
 
     public String getNumero() {
         return numero;

@@ -141,7 +141,7 @@
 
                         <a class="btn-back" href="/clientes/add">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path class="icon-back" d="M12 5V19M5 12H19" stroke="#0033A0" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 Novo Cliente
             </a>
@@ -160,13 +160,14 @@
                             <th>CPF</th>
                             <th>Bandeira</th>
                             <th>CEP</th>
+                            <th>Endereços</th>
                             <th>Editado</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(clientes)}">
-                            <td colspan="8" class="empty-table">
+                            <td colspan="9" class="empty-table">
                                 Nenhum cliente cadastrado no momento.
                             </td>
                         </tr>
@@ -177,7 +178,10 @@
                             <td th:text="${cliente.telefone}"></td>
                             <td th:text="${cliente.cpf}"></td>
                             <td th:text="${cliente.cartao != null ? cliente.cartao.bandeira : ''}"></td>
-                            <td th:text="${cliente.endereco != null ? cliente.endereco.cep : ''}"></td>
+                            <!-- Mostrar o CEP do primeiro endereço ou "Sem endereço" -->
+                            <td th:text="${cliente.enderecos != null and !cliente.enderecos.isEmpty() ? cliente.enderecos[0].cep : 'Sem endereço'}"></td>
+                            <!-- Mostrar quantidade de endereços -->
+                            <td th:text="${cliente.enderecos != null ? #lists.size(cliente.enderecos) : 0}"></td>
                             <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
                             <td>
                                <div class="action-buttons">
@@ -353,7 +357,6 @@
         <div class="copyright">© 2024 <a href="https://matheus-abib-portifolio.up.railway.app/" target="_blank" style="color: #f0f0f0;">Matheus Abib</a>. Todos os direitos reservados.</div>
     </footer>
     <script th:src="@{/js/script.js}"></script>
-
 
 </body>
 </html>

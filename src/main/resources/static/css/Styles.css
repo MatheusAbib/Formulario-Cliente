@@ -8,6 +8,8 @@
     --border-radius: 5px;
     --transition: all 0.3s ease;
     --active-color: #2ecc71;
+    --correios-green: #2ecc71;
+    --correios-dark-green: #27ae60;
     --inactive-color: #e74c3c;
     }
 
@@ -531,9 +533,8 @@ button::after {
     justify-content: center;
     text-decoration: none;
     padding: 10px 20px;
-    background-color: var(--correios-blue);
-    color: white;
-    font-size: 0.85rem;
+    color: var(--correios-blue);
+    font-size: 1rem;
     border-radius: var(--border-radius);
     margin: 5px 0 15px;
     transition: var(--transition);
@@ -542,7 +543,7 @@ button::after {
 }
 
 .btn-back:hover {
-    background-color: var(--correios-dark);
+    border: solid 2px var(--correios-blue);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1396,7 +1397,8 @@ footer {
     flex-direction: column;
     gap: 20px;
     padding: 25px;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    height: 160px;
+    background: #f8f9fa;
     border-radius: var(--border-radius);
     border: 1px solid rgba(0, 51, 160, 0.1);
     position: relative;
@@ -1554,7 +1556,7 @@ footer {
     flex-direction: column;
     gap: 10px;
     padding: 20px;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    background: #ffffff;
     border-radius: var(--border-radius);
     border: 1px solid rgba(0, 51, 160, 0.1);
     box-shadow: 0 4px 12px rgba(0, 51, 160, 0.08);
@@ -1627,7 +1629,7 @@ footer {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     font-size: 0.95rem;
     color: var(--correios-dark-gray);
-    min-height: 85px;
+    min-height: 110px;
     justify-content: center;
 }
 
@@ -1812,8 +1814,9 @@ footer {
 }
 
 .btn-apply {
-    background: linear-gradient(135deg, var(--correios-blue), var(--correios-dark));
-    color: white;
+    color: var(--correios-blue);
+    background: #ffffff00 !important;
+    box-shadow: none;
 }
 
 .btn-clear {
@@ -1823,9 +1826,10 @@ footer {
 }
 
 .btn-apply:hover {
-    background: linear-gradient(135deg, var(--correios-dark), var(--correios-blue));
+    background-color: #ffffff00;
+    border: solid 2px var(--correios-blue) !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 51, 160, 0.25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-clear:hover {
@@ -1905,4 +1909,221 @@ footer {
 .table-scroll-container {
     position: relative;
     min-height: 200px;
+}
+
+
+/* ==================== ESTILOS PARA MÚLTIPLOS ENDEREÇOS ==================== */
+
+.endereco-item {
+    background: #f9f9f9;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.endereco-item:hover {
+    border-color: var(--correios-blue);
+    box-shadow: 0 4px 15px rgba(0, 51, 160, 0.1);
+}
+
+.endereco-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--correios-blue), var(--correios-yellow));
+}
+
+.endereco-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.endereco-title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--correios-blue);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.endereco-numero {
+    background: var(--correios-blue);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 25px;
+    text-align: center;
+}
+
+
+/* BOTÕES COM TAMANHO FIXO */
+.btn-add-endereco {
+    font-size: 0.75rem;
+    padding: 12px 12px !important;
+    text-decoration: none;
+    width: 215px;
+    justify-content: center;
+}
+
+.btn-add-endereco:hover {
+    background: var(--correios-dark);
+}
+
+.btn-remove-endereco {
+    padding: 10px 12px !important;
+    font-size: 0.8rem;
+    gap: 8px !important;
+    width: 125px; 
+    justify-content: center;
+}
+
+.btn-remove-endereco:hover {
+    background: #c0392b;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.enderecos-container {
+    margin-top: 20px;
+}
+
+.cep-loader-dinamico {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--correios-light-blue), #ffffff);
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    color: var(--correios-blue);
+    margin-bottom: 8px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--correios-blue);
+    box-shadow: 0 4px 12px rgba(0, 51, 160, 0.15);
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Animação para adicionar/remover endereços */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 1000px;
+    }
+}
+
+.endereco-item {
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Responsividade para múltiplos endereços */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .btn-add-endereco {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+    }
+    
+    .endereco-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .endereco-title {
+        justify-content: center;
+    }
+    
+    .btn-remove-endereco {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .endereco-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .enderecos-container {
+        margin-top: 15px;
+    }
+}
+
+/* Efeito visual para o último endereço adicionado */
+.endereco-item:last-child {
+    border: 2px solid var(--correios-yellow);
+    background: linear-gradient(135deg, #fffdf0, #ffffff);
+}
+
+.endereco-item:last-child::before {
+    background: linear-gradient(to bottom, var(--correios-yellow), var(--correios-blue));
+}
+
+/* Indicador visual para endereço principal (opcional para futuras implementações) */
+.endereco-principal {
+    border: 2px solid var(--correios-green, #2ecc71);
+    background: linear-gradient(135deg, #f8fff9, #ffffff);
+}
+
+.endereco-principal::before {
+    background: linear-gradient(to bottom, var(--correios-green, #2ecc71), var(--correios-dark-green, #27ae60));
+}
+
+.btn-definir-principal {
+    background: linear-gradient(135deg, var(--correios-blue), var(--correios-dark));
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: var(--transition);
+    font-size: 0.85rem;
+    margin-right: 10px;
+}
+
+.btn-definir-principal:hover {
+    background: linear-gradient(135deg, var(--correios-dark), var(--correios-blue));
+    transform: translateY(-2px);
 }

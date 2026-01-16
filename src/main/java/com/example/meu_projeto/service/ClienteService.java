@@ -1,6 +1,8 @@
 package com.example.meu_projeto.service;
 
 import com.example.meu_projeto.model.Cliente;
+import com.example.meu_projeto.model.Endereco;
+import com.example.meu_projeto.model.Cartao;
 import com.example.meu_projeto.repository.ClienteRepository;
 import com.example.meu_projeto.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,17 @@ public class ClienteService {
     public Cliente adicionarCliente(Cliente cliente) {
         cliente.setSenha(PasswordUtil.encrypt(cliente.getSenha()));
         cliente.setDataCadastro(java.time.LocalDateTime.now());
+        
+        if (cliente.getEnderecos() != null) {
+            for (Endereco endereco : cliente.getEnderecos()) {
+                endereco.setCliente(cliente);
+            }
+        }
+        
+        if (cliente.getCartao() != null) {
+            cliente.getCartao().setCliente(cliente);
+        }
+        
         return clienteRepository.save(cliente);
     }
 
@@ -34,7 +47,6 @@ public class ClienteService {
             return clienteRepository.findByNomeContainingIgnoreCase(nome, pageable);
         }
         
-        // Filtra por telefone
         if (telefone != null && !telefone.isEmpty()) {
             return clienteRepository.findByTelefone(telefone, pageable);
         }
@@ -81,12 +93,39 @@ public class ClienteService {
                 cliente.setTelefone(clienteAtualizado.getTelefone());
                 cliente.setDataAlteracao(java.time.LocalDateTime.now());
                 
-                if (clienteAtualizado.getEndereco() != null) {
-                    cliente.setEndereco(clienteAtualizado.getEndereco());
+                if (clienteAtualizado.getEnderecos() != null && !clienteAtualizado.getEnderecos().isEmpty()) {
+                    cliente.getEnderecos().clear();
+                    
+                    for (Endereco endereco : clienteAtualizado.getEnderecos()) {
+                        if (endereco != null) {
+                            Endereco novoEndereco = new Endereco();
+                            novoEndereco.setTipoResidencia(endereco.getTipoResidencia());
+                            novoEndereco.setNumero(endereco.getNumero());
+                            novoEndereco.setBairro(endereco.getBairro());
+                            novoEndereco.setCep(endereco.getCep());
+                            novoEndereco.setCidade(endereco.getCidade());
+                            novoEndereco.setEstado(endereco.getEstado());
+                            novoEndereco.setPais(endereco.getPais());
+                            novoEndereco.setEnderecoEntrega(endereco.getEnderecoEntrega());
+                            novoEndereco.setDescricaoEndereco(endereco.getDescricaoEndereco());
+                            novoEndereco.setCliente(cliente);
+                            cliente.addEndereco(novoEndereco);
+                        }
+                    }
                 }
                 
                 if (clienteAtualizado.getCartao() != null) {
-                    cliente.setCartao(clienteAtualizado.getCartao());
+                    Cartao cartao = cliente.getCartao();
+                    if (cartao == null) {
+                        cartao = new Cartao();
+                    }
+                    cartao.setNumeroCartao(clienteAtualizado.getCartao().getNumeroCartao());
+                    cartao.setBandeira(clienteAtualizado.getCartao().getBandeira());
+                    cartao.setCodigoSeguranca(clienteAtualizado.getCartao().getCodigoSeguranca());
+                    cartao.setNomeCartao(clienteAtualizado.getCartao().getNomeCartao());
+                    cartao.setValidade(clienteAtualizado.getCartao().getValidade());
+                    cartao.setCliente(cliente);
+                    cliente.setCartao(cartao);
                 }
                 
                 return clienteRepository.save(cliente);

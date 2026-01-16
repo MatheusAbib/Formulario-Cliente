@@ -71,7 +71,8 @@ public String listarClientes(
     @GetMapping("/add")
     public String showForm(Model model) {
         Cliente cliente = new Cliente();
-        cliente.setEndereco(new Endereco());
+        Endereco enderecoInicial = new Endereco();
+        cliente.addEndereco(enderecoInicial);
         cliente.setCartao(new Cartao());
 
         model.addAttribute("cliente", cliente);
@@ -82,6 +83,15 @@ public String listarClientes(
 public String addCliente(@ModelAttribute Cliente cliente,
                        @RequestParam String senha,
                        @RequestParam String confirmarSenha,
+                       @RequestParam(value = "enderecos[0].tipoResidencia", required = false) String tipoResidencia,
+                       @RequestParam(value = "enderecos[0].numero", required = false) String numero,
+                       @RequestParam(value = "enderecos[0].bairro", required = false) String bairro,
+                       @RequestParam(value = "enderecos[0].cep", required = false) String cep,
+                       @RequestParam(value = "enderecos[0].cidade", required = false) String cidade,
+                       @RequestParam(value = "enderecos[0].estado", required = false) String estado,
+                       @RequestParam(value = "enderecos[0].pais", required = false) String pais,
+                       @RequestParam(value = "enderecos[0].enderecoEntrega", required = false) String enderecoEntrega,
+                       @RequestParam(value = "enderecos[0].descricaoEndereco", required = false) String descricaoEndereco,
                        Model model,
                        RedirectAttributes redirectAttributes) {
     
@@ -118,9 +128,25 @@ public String addCliente(@ModelAttribute Cliente cliente,
     cliente.setSenha(senha);
     cliente.setDataCadastro(LocalDateTime.now());
 
-    if (cliente.getEndereco() != null) {
-        cliente.getEndereco().setCliente(cliente);
+    if (cliente.getEnderecos() != null && !cliente.getEnderecos().isEmpty()) {
+        for (Endereco endereco : cliente.getEnderecos()) {
+            endereco.setCliente(cliente);
+        }
+    } else {
+        Endereco endereco = new Endereco();
+        endereco.setTipoResidencia(tipoResidencia);
+        endereco.setNumero(numero);
+        endereco.setBairro(bairro);
+        endereco.setCep(cep);
+        endereco.setCidade(cidade);
+        endereco.setEstado(estado);
+        endereco.setPais(pais);
+        endereco.setEnderecoEntrega(enderecoEntrega);
+        endereco.setDescricaoEndereco(descricaoEndereco);
+        endereco.setCliente(cliente);
+        cliente.addEndereco(endereco);
     }
+    
     if (cliente.getCartao() != null) {
         cliente.getCartao().setCliente(cliente);
     }
@@ -147,8 +173,8 @@ public String addCliente(@ModelAttribute Cliente cliente,
         Cliente cliente = clienteRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
 
-        if (cliente.getEndereco() == null) {
-            cliente.setEndereco(new Endereco());
+        if (cliente.getEnderecos() == null || cliente.getEnderecos().isEmpty()) {
+            cliente.addEndereco(new Endereco());
         }
         if (cliente.getCartao() == null) {
             cliente.setCartao(new Cartao());
@@ -251,22 +277,24 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
             original.setSenha(senha);
         }
 
-        if (atualizado.getEndereco() != null) {
-            Endereco end = original.getEndereco();
-            if (end == null) {
-                end = new Endereco();
-                original.setEndereco(end);
+        if (atualizado.getEnderecos() != null && !atualizado.getEnderecos().isEmpty()) {
+            original.getEnderecos().clear();
+            for (Endereco end : atualizado.getEnderecos()) {
+                if (end != null) {
+                    Endereco novoEnd = new Endereco();
+                    novoEnd.setTipoResidencia(end.getTipoResidencia());
+                    novoEnd.setNumero(end.getNumero());
+                    novoEnd.setBairro(end.getBairro());
+                    novoEnd.setCep(end.getCep());
+                    novoEnd.setCidade(end.getCidade());
+                    novoEnd.setEstado(end.getEstado());
+                    novoEnd.setPais(end.getPais());
+                    novoEnd.setEnderecoEntrega(end.getEnderecoEntrega());
+                    novoEnd.setDescricaoEndereco(end.getDescricaoEndereco());
+                    novoEnd.setCliente(original);
+                    original.addEndereco(novoEnd);
+                }
             }
-            end.setTipoResidencia(atualizado.getEndereco().getTipoResidencia());
-            end.setNumero(atualizado.getEndereco().getNumero());
-            end.setBairro(atualizado.getEndereco().getBairro());
-            end.setCep(atualizado.getEndereco().getCep());
-            end.setCidade(atualizado.getEndereco().getCidade());
-            end.setEstado(atualizado.getEndereco().getEstado());
-            end.setPais(atualizado.getEndereco().getPais());
-            end.setEnderecoEntrega(atualizado.getEndereco().getEnderecoEntrega());
-            end.setDescricaoEndereco(atualizado.getEndereco().getDescricaoEndereco());
-            end.setCliente(original);
         }
 
         if (atualizado.getCartao() != null) {
@@ -341,9 +369,13 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
     private Map<String, Integer> contarPorEstado(List<Cliente> clientes) {
         Map<String, Integer> contagem = new HashMap<>();
         for (Cliente cliente : clientes) {
-            if (cliente.getEndereco() != null && cliente.getEndereco().getEstado() != null) {
-                String estado = cliente.getEndereco().getEstado();
-                contagem.put(estado, contagem.getOrDefault(estado, 0) + 1);
+            if (cliente.getEnderecos() != null && !cliente.getEnderecos().isEmpty()) {
+                for (Endereco endereco : cliente.getEnderecos()) {
+                    if (endereco.getEstado() != null) {
+                        String estado = endereco.getEstado();
+                        contagem.put(estado, contagem.getOrDefault(estado, 0) + 1);
+                    }
+                }
             }
         }
         return contagem;
@@ -479,10 +511,11 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         List<Cliente> todosClientes = clienteRepository.findAll();
         
         Map<String, Long> contagemPorCidade = todosClientes.stream()
-            .filter(c -> c.getEndereco() != null)
-            .filter(c -> c.getEndereco().getCidade() != null)
+            .filter(c -> c.getEnderecos() != null && !c.getEnderecos().isEmpty())
+            .flatMap(c -> c.getEnderecos().stream())
+            .filter(e -> e.getCidade() != null)
             .collect(Collectors.groupingBy(
-                c -> c.getEndereco().getCidade(),
+                Endereco::getCidade,
                 Collectors.counting()
             ));
         
