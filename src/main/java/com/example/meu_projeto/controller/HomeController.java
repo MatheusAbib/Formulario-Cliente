@@ -16,17 +16,21 @@ public class HomeController {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    @GetMapping({"/", "/clientes"})
-    public String clientes(
-            @RequestParam(defaultValue = "0") int page,
-            Model model
-    ) {
-        PageRequest pageable = PageRequest.of(page, 10); 
-        Page<Cliente> paginaClientes = clienteRepository.findAll(pageable);
+@GetMapping({"/", "/clientes"})
+public String clientes(
+        @RequestParam(defaultValue = "0") int page,
+        Model model
+) {
+    PageRequest pageable = PageRequest.of(page, 10);
+    Page<Cliente> paginaClientes = clienteRepository.findAll(pageable);
 
-        model.addAttribute("clientes", paginaClientes.getContent()); 
-        model.addAttribute("pagina", paginaClientes);                
+    model.addAttribute("clientes", paginaClientes.getContent());
+    model.addAttribute("paginaAtual", page);
+    model.addAttribute("totalPaginas", paginaClientes.getTotalPages());
+    model.addAttribute("totalItens", paginaClientes.getTotalElements());
+    model.addAttribute("tamanhoPagina", 10);
 
-        return "clientes";
-    }
+    return "clientes";
+}
+
 }
