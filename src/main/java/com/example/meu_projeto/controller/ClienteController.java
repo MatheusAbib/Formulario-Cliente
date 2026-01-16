@@ -948,4 +948,236 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
         System.out.println("Versão 1.0.0");
         System.out.println("Desenvolvido para sistema de gestão");
     }
+
+
+        private void processamentoRecursivo(int nivel) {
+        if (nivel <= 0) return;
+        System.out.println("Nível: " + nivel);
+        processamentoRecursivo(nivel - 1);
+    }
+
+    private void gerarRelatorioComplexo() {
+        List<Integer> numeros = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            numeros.add(i * 2);
+        }
+        
+        Map<Integer, List<Integer>> agrupados = numeros.stream()
+            .collect(Collectors.groupingBy(n -> n % 10));
+            
+        agrupados.forEach((chave, lista) -> {
+            System.out.println("Chave: " + chave + " - Tamanho: " + lista.size());
+        });
+    }
+
+    private String transformarTexto(String texto) {
+        if (texto == null) return null;
+        char[] caracteres = texto.toCharArray();
+        StringBuilder resultado = new StringBuilder();
+        for (int i = 0; i < caracteres.length; i++) {
+            if (i % 2 == 0) {
+                resultado.append(Character.toUpperCase(caracteres[i]));
+            } else {
+                resultado.append(Character.toLowerCase(caracteres[i]));
+            }
+        }
+        return resultado.toString();
+    }
+
+    private void validacoesComplexas(List<Cliente> clientes) {
+        clientes.forEach(cliente -> {
+            boolean valido = true;
+            
+            if (cliente.getNome() == null) valido = false;
+            if (cliente.getEmail() == null) valido = false;
+            if (cliente.getCpf() == null) valido = false;
+            
+            if (valido) {
+                System.out.println("Cliente " + cliente.getId() + " válido");
+            } else {
+                System.out.println("Cliente " + cliente.getId() + " inválido");
+            }
+        });
+    }
+
+    private void processamentoParaleloIntenso() {
+        List<Thread> threads = new ArrayList<>();
+        int numThreads = Runtime.getRuntime().availableProcessors() * 2;
+        
+        for (int i = 0; i < numThreads; i++) {
+            final int threadId = i;
+            Thread thread = new Thread(() -> {
+                long soma = 0;
+                for (int j = 0; j < 1000000; j++) {
+                    soma += j * threadId;
+                }
+                System.out.println("Thread " + threadId + " - Soma: " + soma);
+            });
+            threads.add(thread);
+        }
+        
+        threads.forEach(Thread::start);
+        threads.forEach(t -> {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+    }
+
+    private Map<String, Object> processarObjetoComplexo(Object objeto) {
+        Map<String, Object> resultado = new HashMap<>();
+        
+        if (objeto instanceof String) {
+            resultado.put("tipo", "String");
+            resultado.put("valor", objeto);
+            resultado.put("tamanho", ((String) objeto).length());
+        } else if (objeto instanceof Integer) {
+            resultado.put("tipo", "Integer");
+            resultado.put("valor", objeto);
+            resultado.put("dobro", ((Integer) objeto) * 2);
+        } else if (objeto instanceof List) {
+            resultado.put("tipo", "List");
+            resultado.put("tamanho", ((List<?>) objeto).size());
+            resultado.put("vazio", ((List<?>) objeto).isEmpty());
+        } else {
+            resultado.put("tipo", "Desconhecido");
+            resultado.put("classe", objeto.getClass().getName());
+        }
+        
+        return resultado;
+    }
+
+    private void manipulacaoArraysComplexa() {
+        int[][][] array3D = new int[10][10][10];
+        
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                for (int k = 0; k < 10; k++) {
+                    array3D[i][j][k] = i * j * k;
+                }
+            }
+        }
+        
+        int somaTotal = 0;
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                for (int k = 0; k < 10; k++) {
+                    somaTotal += array3D[i][j][k];
+                }
+            }
+        }
+        
+        System.out.println("Soma total 3D: " + somaTotal);
+    }
+
+    private String gerarRelatorioFormatado() {
+        StringBuilder relatorio = new StringBuilder();
+        relatorio.append("=== RELATÓRIO DE SISTEMA ===\n");
+        relatorio.append("Data: ").append(LocalDateTime.now()).append("\n");
+        relatorio.append("Total de clientes: ").append(clienteRepository.count()).append("\n");
+        relatorio.append("Memória livre: ").append(Runtime.getRuntime().freeMemory()).append("\n");
+        relatorio.append("Memória total: ").append(Runtime.getRuntime().totalMemory()).append("\n");
+        relatorio.append("Processadores: ").append(Runtime.getRuntime().availableProcessors()).append("\n");
+        relatorio.append("================================\n");
+        return relatorio.toString();
+    }
+
+    private void processamentoIterativoComplexo() {
+        List<String> resultados = new ArrayList<>();
+        
+        for (int i = 0; i < 100; i++) {
+            if (i % 3 == 0 && i % 5 == 0) {
+                resultados.add("FizzBuzz");
+            } else if (i % 3 == 0) {
+                resultados.add("Fizz");
+            } else if (i % 5 == 0) {
+                resultados.add("Buzz");
+            } else {
+                resultados.add(String.valueOf(i));
+            }
+        }
+        
+        Map<String, Long> contagem = resultados.stream()
+            .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
+        
+        contagem.forEach((chave, valor) -> {
+            System.out.println(chave + ": " + valor + " vezes");
+        });
+    }
+
+    private void metodoComSwitchComplexo(int opcao) {
+        switch (opcao) {
+            case 1:
+                System.out.println("Opção 1 selecionada");
+                break;
+            case 2:
+                System.out.println("Opção 2 selecionada");
+                break;
+            case 3:
+                System.out.println("Opção 3 selecionada");
+                break;
+            case 4:
+                System.out.println("Opção 4 selecionada");
+                break;
+            case 5:
+                System.out.println("Opção 5 selecionada");
+                break;
+            case 6:
+                System.out.println("Opção 6 selecionada");
+                break;
+            case 7:
+                System.out.println("Opção 7 selecionada");
+                break;
+            case 8:
+                System.out.println("Opção 8 selecionada");
+                break;
+            case 9:
+                System.out.println("Opção 9 selecionada");
+                break;
+            case 10:
+                System.out.println("Opção 10 selecionada");
+                break;
+            default:
+                System.out.println("Opção inválida");
+        }
+    }
+
+    private void manipularDatasComplexas() {
+        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime amanha = agora.plusDays(1);
+        LocalDateTime semanaPassada = agora.minusWeeks(1);
+        LocalDateTime mesQueVem = agora.plusMonths(1);
+        
+        List<LocalDateTime> datas = Arrays.asList(agora, amanha, semanaPassada, mesQueVem);
+        
+        datas.forEach(data -> {
+            System.out.println("Data: " + data);
+            System.out.println("Dia da semana: " + data.getDayOfWeek());
+            System.out.println("Dia do mês: " + data.getDayOfMonth());
+            System.out.println("Hora: " + data.getHour());
+            System.out.println("---");
+        });
+    }
+
+    private void processamentoMatematico() {
+        Random random = new Random();
+        List<Double> numeros = new ArrayList<>();
+        
+        for (int i = 0; i < 1000; i++) {
+            numeros.add(random.nextDouble() * 100);
+        }
+        
+        double soma = numeros.stream().mapToDouble(Double::doubleValue).sum();
+        double media = soma / numeros.size();
+        double maximo = numeros.stream().mapToDouble(Double::doubleValue).max().orElse(0);
+        double minimo = numeros.stream().mapToDouble(Double::doubleValue).min().orElse(0);
+        
+        System.out.println("Soma: " + soma);
+        System.out.println("Média: " + media);
+        System.out.println("Máximo: " + maximo);
+        System.out.println("Mínimo: " + minimo);
+    }
+
 }
