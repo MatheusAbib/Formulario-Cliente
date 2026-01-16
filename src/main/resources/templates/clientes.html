@@ -114,8 +114,9 @@
         </a>
     </div>
     
-    <input type="hidden" name="pagina" th:value="${paginaAtual}">
-    <input type="hidden" name="tamanho" th:value="${tamanhoPagina}">
+<input type="hidden" name="pagina" th:value="${paginaAtual != null ? paginaAtual : 0}">
+<input type="hidden" name="tamanho" th:value="${tamanhoPagina != null ? tamanhoPagina : 10}">
+
 </form>
     
     <div class="filters-info" th:if="${param.nome != null or param.telefone != null or param.cpf != null or param.cep != null}">
@@ -205,10 +206,10 @@
 
 
 <div class="pagination-with-size">
-    <div th:if="${totalPaginas > 1}" class="pagination-container">
+    <div th:if="${totalPaginas != null and totalPaginas > 1}" class="pagination-container">
         <div class="pagination-info">
             Mostrando
-            <span th:text="${(paginaAtual * tamanhoPagina) + clientes.size()}">10</span> de 
+            <span th:text="${clientes != null ? (paginaAtual * tamanhoPagina) + clientes.size() : 0}">0</span> de 
             <span th:text="${totalItens}">0</span> clientes cadastrados
         </div>
         
@@ -232,7 +233,8 @@
             </span>
             
             <div class="pagination-numbers">
-                <span th:each="pagina : ${#numbers.sequence(0, totalPaginas - 1)}">
+                <span th:if="${totalPaginas != null}"
+                    th:each="pagina : ${#numbers.sequence(0, totalPaginas - 1)}">
                     <a th:if="${pagina >= paginaAtual - 2 and pagina <= paginaAtual + 2 or totalPaginas <= 7}"
                        th:href="@{/clientes(pagina=${pagina}, tamanho=${tamanhoPagina})}"
                        th:class="'pagination-number' + (${paginaAtual == pagina} ? ' active' : '')"
