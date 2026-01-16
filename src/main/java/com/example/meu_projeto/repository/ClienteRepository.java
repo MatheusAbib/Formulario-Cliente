@@ -29,4 +29,9 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
         WHERE e.cep = :cep
     """)
     Page<Cliente> findByEnderecoCep(@Param("cep") String cep, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"enderecos", "cartao"})
+    @Query("SELECT c FROM Cliente c WHERE c.id = :id")
+    Cliente buscarPorIdComRelacionamentos(@Param("id") Long id);
+
 }

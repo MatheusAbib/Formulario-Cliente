@@ -185,12 +185,17 @@ public String addCliente(@ModelAttribute Cliente cliente,
 
 @GetMapping("/editar/{id}")
 public String editarCliente(@PathVariable Long id, Model model) {
-    Cliente cliente = clienteRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+
+    Cliente cliente = clienteRepository.buscarPorIdComRelacionamentos(id);
+
+    if (cliente == null) {
+        throw new IllegalArgumentException("Cliente não encontrado");
+    }
 
     if (cliente.getEnderecos() == null || cliente.getEnderecos().isEmpty()) {
         cliente.addEndereco(new Endereco());
     }
+
     if (cliente.getCartao() == null) {
         cliente.setCartao(new Cartao());
     }
@@ -328,12 +333,17 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
 
         original.setDataAlteracao(LocalDateTime.now());
     }
-
+    
     @GetMapping("/detalhes/{id}")
     @ResponseBody
     public ResponseEntity<Cliente> detalhesCliente(@PathVariable Long id) {
-        Cliente cliente = clienteRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+
+        Cliente cliente = clienteRepository.buscarPorIdComRelacionamentos(id);
+
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente não encontrado");
+        }
+
         return ResponseEntity.ok(cliente);
     }
 
