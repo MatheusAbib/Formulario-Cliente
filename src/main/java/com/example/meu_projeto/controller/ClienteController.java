@@ -57,16 +57,21 @@ public String listarClientes(
         @RequestParam(required = false) String cep,
         Model model) {
     
-    Page<Cliente> paginaClientes = clienteService.filtrarClientes(nome, telefone, cpf, cep, pagina, tamanho);
-    
-    model.addAttribute("clientes", paginaClientes.getContent());
-    model.addAttribute("paginaAtual", pagina);
-    model.addAttribute("totalPaginas", paginaClientes.getTotalPages());
-    model.addAttribute("totalItens", paginaClientes.getTotalElements());
-    model.addAttribute("tamanhoPagina", tamanho);
-    
-    return "clientes";
-}
+        Page<Cliente> paginaClientes = clienteService.filtrarClientes(nome, telefone, cpf, cep, pagina, tamanho);
+
+        int totalPaginas = paginaClientes.getTotalPages();
+        if (totalPaginas == 0) {
+            totalPaginas = 1;
+        }
+
+        model.addAttribute("clientes", paginaClientes.getContent());
+        model.addAttribute("paginaAtual", pagina);
+        model.addAttribute("totalPaginas", totalPaginas);
+        model.addAttribute("totalItens", paginaClientes.getTotalElements());
+        model.addAttribute("tamanhoPagina", tamanho);
+
+        return "clientes";
+        }
 
     @GetMapping("/add")
     public String showForm(Model model) {
@@ -158,7 +163,7 @@ public String addCliente(@ModelAttribute Cliente cliente,
         redirectAttributes.addFlashAttribute("toastTitle", "Sucesso!");
         redirectAttributes.addFlashAttribute("toastMessage", "Cliente cadastrado com sucesso.");
         
-        return "redirect:/clientes";
+        return "redirect:/clientes?pagina=0&tamanho=10";
         
     } catch (Exception e) {
         model.addAttribute("toastType", "error");
@@ -243,7 +248,7 @@ public String salvarAlteracoes(@PathVariable Long id,
         redirectAttributes.addFlashAttribute("toastTitle", "Sucesso!");
         redirectAttributes.addFlashAttribute("toastMessage", "Cliente atualizado com sucesso.");
         
-        return "redirect:/clientes";
+        return "redirect:/clientes?pagina=0&tamanho=10";
         
     } catch (Exception e) {
         model.addAttribute("cliente", clienteAtualizado);
@@ -262,7 +267,7 @@ public String excluirCliente(@PathVariable Long id, RedirectAttributes redirectA
     redirectAttributes.addFlashAttribute("toastTitle", "Sucesso!");
     redirectAttributes.addFlashAttribute("toastMessage", "Cliente excluído com sucesso.");
     
-    return "redirect:/clientes";
+    return "redirect:/clientes?pagina=0&tamanho=10";
 }
 
     private void atualizarCliente(Cliente original, Cliente atualizado, String senha) {
