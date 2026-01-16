@@ -183,21 +183,21 @@ public String addCliente(@ModelAttribute Cliente cliente,
     }
 }
 
-    @GetMapping("/editar/{id}")
-    public String editarCliente(@PathVariable Long id, Model model) {
-        Cliente cliente = clienteRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+@GetMapping("/editar/{id}")
+public String editarCliente(@PathVariable Long id, Model model) {
+    Cliente cliente = clienteRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
 
-        if (cliente.getEnderecos() == null || cliente.getEnderecos().isEmpty()) {
-            cliente.addEndereco(new Endereco());
-        }
-        if (cliente.getCartao() == null) {
-            cliente.setCartao(new Cartao());
-        }
-
-        model.addAttribute("cliente", cliente);
-        return "formularioCliente";
+    if (cliente.getEnderecos() == null || cliente.getEnderecos().isEmpty()) {
+        cliente.addEndereco(new Endereco());
     }
+    if (cliente.getCartao() == null) {
+        cliente.setCartao(new Cartao());
+    }
+
+    model.addAttribute("cliente", cliente);
+    return "formularioCliente";
+}
 
 @PostMapping("/editar/{id}")
 public String salvarAlteracoes(@PathVariable Long id,

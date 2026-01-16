@@ -8,10 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     @EntityGraph(attributePaths = {"enderecos", "cartao"})
     Page<Cliente> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"enderecos", "cartao"})
+    Optional<Cliente> findById(Long id);
 
     Page<Cliente> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
     Page<Cliente> findByTelefone(String telefone, Pageable pageable);
