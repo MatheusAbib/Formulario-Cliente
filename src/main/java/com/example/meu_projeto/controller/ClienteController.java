@@ -56,22 +56,32 @@ public String listarClientes(
         @RequestParam(required = false) String cpf,
         @RequestParam(required = false) String cep,
         Model model) {
-    
-        Page<Cliente> paginaClientes = clienteService.filtrarClientes(nome, telefone, cpf, cep, pagina, tamanho);
 
-        int totalPaginas = paginaClientes.getTotalPages();
-        if (totalPaginas == 0) {
-            totalPaginas = 1;
+    Page<Cliente> paginaClientes =
+            clienteService.filtrarClientes(nome, telefone, cpf, cep, pagina, tamanho);
+
+    int totalPaginas = paginaClientes.getTotalPages();
+    if (totalPaginas == 0) {
+        totalPaginas = 1;
+    }
+
+    List<Cliente> clientes = paginaClientes.getContent();
+
+    clientes.forEach(cliente -> {
+        if (cliente.getEnderecos() != null) {
+            cliente.getEnderecos().size();
         }
+    });
 
-        model.addAttribute("clientes", paginaClientes.getContent());
-        model.addAttribute("paginaAtual", pagina);
-        model.addAttribute("totalPaginas", totalPaginas);
-        model.addAttribute("totalItens", paginaClientes.getTotalElements());
-        model.addAttribute("tamanhoPagina", tamanho);
+    model.addAttribute("clientes", clientes);
+    model.addAttribute("paginaAtual", pagina);
+    model.addAttribute("totalPaginas", totalPaginas);
+    model.addAttribute("totalItens", paginaClientes.getTotalElements());
+    model.addAttribute("tamanhoPagina", tamanho);
 
-        return "clientes";
-        }
+    return "clientes";
+}
+
 
     @GetMapping("/add")
     public String showForm(Model model) {

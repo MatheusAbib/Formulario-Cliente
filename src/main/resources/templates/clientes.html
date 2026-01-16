@@ -178,11 +178,14 @@
                             <td th:text="${cliente.nome}"></td>
                             <td th:text="${cliente.telefone}"></td>
                             <td th:text="${cliente.cpf}"></td>
-                            <td th:text="${cliente.cartao != null ? cliente.cartao.bandeira : ''}"></td>
+                            <td th:text="${cliente.cartao != null and cliente.cartao.bandeira != null 
+                                ? cliente.cartao.bandeira 
+                                : ''}">
+                            </td>
                             <!-- Mostrar o CEP do primeiro endereço ou "Sem endereço" -->
-                            <td th:text="${cliente.enderecos != null and !cliente.enderecos.isEmpty() ? cliente.enderecos[0].cep : 'Sem endereço'}"></td>
+                            <td th:text="${cliente.enderecos != null and !#lists.isEmpty(cliente.enderecos) ? cliente.enderecos[0].cep : 'Sem endereço'}"></td>
                             <!-- Mostrar quantidade de endereços -->
-                            <td th:text="${cliente.enderecos != null ? #lists.size(cliente.enderecos) : 0}"></td>
+                                <td th:text="${cliente.enderecos != null ? #lists.size(cliente.enderecos) : 0}"></td>
                             <td th:text="${cliente.dataAlteracao != null ? cliente.dataAlteracao.format(T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm:ss')) : 'Ainda não alterado'}"></td>
                             <td>
                                <div class="action-buttons">
