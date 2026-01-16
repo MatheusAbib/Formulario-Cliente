@@ -619,6 +619,42 @@ footer {
 }
 
 @media (max-width: 768px) {
+
+     .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .btn-add-endereco {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+    }
+    
+    .endereco-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .endereco-title {
+        justify-content: center;
+    }
+    
+    .btn-remove-endereco {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .endereco-item {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .enderecos-container {
+        margin-top: 15px;
+    }
     body {
         grid-template-rows: auto auto 1fr auto;
         grid-template-columns: 1fr;
@@ -1356,6 +1392,20 @@ footer {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 1000px;
+    }
+}
+
+
 .toast::before {
     content: '';
     position: absolute;
@@ -1911,9 +1961,6 @@ footer {
     min-height: 200px;
 }
 
-
-/* ==================== ESTILOS PARA MÚLTIPLOS ENDEREÇOS ==================== */
-
 .endereco-item {
     background: #f9f9f9;
     border-radius: var(--border-radius);
@@ -1970,8 +2017,6 @@ footer {
     text-align: center;
 }
 
-
-/* BOTÕES COM TAMANHO FIXO */
 .btn-add-endereco {
     font-size: 0.75rem;
     padding: 12px 12px !important;
@@ -2030,64 +2075,10 @@ footer {
     animation: fadeIn 0.3s ease;
 }
 
-/* Animação para adicionar/remover endereços */
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-        max-height: 0;
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-        max-height: 1000px;
-    }
-}
-
 .endereco-item {
     animation: slideDown 0.3s ease-out;
 }
 
-/* Responsividade para múltiplos endereços */
-@media (max-width: 768px) {
-    .section-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    
-    .btn-add-endereco {
-        width: 100%;
-        justify-content: center;
-        margin-left: 0;
-    }
-    
-    .endereco-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    
-    .endereco-title {
-        justify-content: center;
-    }
-    
-    .btn-remove-endereco {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .endereco-item {
-        padding: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .enderecos-container {
-        margin-top: 15px;
-    }
-}
-
-/* Efeito visual para o último endereço adicionado */
 .endereco-item:last-child {
     border: 2px solid var(--correios-yellow);
     background: linear-gradient(135deg, #fffdf0, #ffffff);
@@ -2097,7 +2088,6 @@ footer {
     background: linear-gradient(to bottom, var(--correios-yellow), var(--correios-blue));
 }
 
-/* Indicador visual para endereço principal (opcional para futuras implementações) */
 .endereco-principal {
     border: 2px solid var(--correios-green, #2ecc71);
     background: linear-gradient(135deg, #f8fff9, #ffffff);

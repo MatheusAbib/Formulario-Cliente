@@ -136,7 +136,6 @@ function adicionarEndereco() {
     showToast('success', 'Endereço adicionado', 'Novo endereço foi adicionado ao formulário.');
 }
 
-// ==================== FUNÇÕES PARA EXCLUSÃO DE ENDEREÇO ====================
 
 let enderecoParaExcluir = null;
 
